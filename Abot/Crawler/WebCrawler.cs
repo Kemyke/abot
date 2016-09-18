@@ -886,7 +886,10 @@ namespace Abot.Crawler
             //CrawledPage crawledPage = await _pageRequester.MakeRequestAsync(pageToCrawl.Uri, ShouldDownloadPageContent);
 
             dynamic combinedPageBag = this.CombinePageBags(pageToCrawl.PageBag, crawledPage.PageBag);
-            Mapper.CreateMap<PageToCrawl, CrawledPage>();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<PageToCrawl, CrawledPage>();
+            });
             Mapper.Map(pageToCrawl, crawledPage);
             crawledPage.PageBag = combinedPageBag;
 

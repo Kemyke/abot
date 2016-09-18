@@ -39,9 +39,12 @@ namespace Abot.Core
 
         public CrawlConfiguration Convert()
         {
-            AutoMapper.Mapper.CreateMap<CrawlBehaviorElement, CrawlConfiguration>();
-            AutoMapper.Mapper.CreateMap<PolitenessElement, CrawlConfiguration>();
-            AutoMapper.Mapper.CreateMap<AuthorizationElement, CrawlConfiguration>();
+            AutoMapper.Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<CrawlBehaviorElement, CrawlConfiguration>();
+                cfg.CreateMap<PolitenessElement, CrawlConfiguration>();
+                cfg.CreateMap<AuthorizationElement, CrawlConfiguration>();
+            });
 
 
             CrawlConfiguration config = new CrawlConfiguration();

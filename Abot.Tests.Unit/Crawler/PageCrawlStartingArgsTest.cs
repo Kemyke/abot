@@ -17,10 +17,12 @@ namespace Abot.Tests.Unit.Crawler
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_NullArg()
         {
-            new PageCrawlStartingArgs(new CrawlContext(), null);
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new PageCrawlStartingArgs(new CrawlContext(), null);
+            });
         }
     }
 }

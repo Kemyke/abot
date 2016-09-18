@@ -20,24 +20,30 @@ namespace Abot.Tests.Unit.Crawler
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_NullReason()
         {
+            Assert.Throws<ArgumentNullException>(() =>
+            { 
             new PageCrawlDisallowedArgs(_context, _page, null);
+            });
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_EmptyReason()
         {
-            new PageCrawlDisallowedArgs(_context, _page, "");
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new PageCrawlDisallowedArgs(_context, _page, "");
+            });
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_WhitespaceReason()
         {
-            new PageCrawlDisallowedArgs(_context, _page, "   ");
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                new PageCrawlDisallowedArgs(_context, _page, "   ");
+            });
         }
     }
 }
