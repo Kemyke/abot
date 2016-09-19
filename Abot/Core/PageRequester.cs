@@ -82,7 +82,7 @@ namespace Abot.Core
             {
                 request = BuildRequestObject(uri);
                 crawledPage.RequestStarted = DateTime.Now;
-                response = (HttpWebResponse)request.GetResponseAsync().Result;
+                response = (HttpWebResponse)request.GetResponseAsync().Result; //TODO use await
                 ProcessResponseObject(response);
             }
             catch (WebException e)
