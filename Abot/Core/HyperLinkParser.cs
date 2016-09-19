@@ -18,7 +18,6 @@ namespace Abot.Core
         IEnumerable<Uri> GetLinks(CrawledPage crawledPage);
     }
 
-    [Serializable]
     public abstract class HyperLinkParser : IHyperLinkParser
     {
         protected ILogger _logger = LogManager.GetLogger("AbotLogger");

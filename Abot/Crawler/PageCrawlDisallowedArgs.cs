@@ -3,7 +3,6 @@ using System;
 
 namespace Abot.Crawler
 {
-    [Serializable]
     public class PageCrawlDisallowedArgs: PageCrawlStartingArgs
     {
         public string DisallowedReason { get; private set; }

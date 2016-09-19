@@ -27,7 +27,6 @@ namespace Abot.Core
         IRobots Robots { get; }
     }
 
-    [Serializable]
     public class RobotsDotText : IRobotsDotText
     {
         ILogger _logger = LogManager.GetLogger("AbotLogger");

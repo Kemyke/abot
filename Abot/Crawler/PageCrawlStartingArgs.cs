@@ -3,7 +3,6 @@ using System;
 
 namespace Abot.Crawler
 {
-    [Serializable]
     public class PageCrawlStartingArgs : CrawlArgs
     {
         public PageToCrawl PageToCrawl { get; private set; }

@@ -27,7 +27,6 @@ namespace Abot.Core
         //Task<CrawledPage> MakeRequestAsync(Uri uri, Func<CrawledPage, CrawlDecision> shouldDownloadContent);
     }
 
-    [Serializable]
     public class PageRequester : IPageRequester
     {
         static ILogger _logger = LogManager.GetLogger("AbotLogger");
@@ -83,7 +82,7 @@ namespace Abot.Core
             {
                 request = BuildRequestObject(uri);
                 crawledPage.RequestStarted = DateTime.Now;
-                response = (HttpWebResponse)request.GetResponse();
+                response = (HttpWebResponse)request.GetResponseAsync().Result;
                 ProcessResponseObject(response);
             }
             catch (WebException e)
@@ -122,7 +121,7 @@ namespace Abot.Core
                             _logger.Debug("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
                         }
 
-                        response.Close();//Should already be closed by _extractor but just being safe
+                        response.Dispose();//Should already be closed by _extractor but just being safe
                     }
                 }
                 catch (Exception e)

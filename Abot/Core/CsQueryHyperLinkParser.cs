@@ -9,7 +9,6 @@ namespace Abot.Core
     /// <summary>
     /// Parser that uses CsQuery https://github.com/jamietre/CsQuery to parse page links
     /// </summary>
-    [Serializable]
     public class CSQueryHyperlinkParser : HyperLinkParser
     {
         public CSQueryHyperlinkParser()

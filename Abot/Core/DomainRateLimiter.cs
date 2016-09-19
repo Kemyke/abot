@@ -32,7 +32,6 @@ namespace Abot.Core
         void RemoveDomain(Uri uri);
     }
 
-    [Serializable]
     public class DomainRateLimiter : IDomainRateLimiter
     {
         static ILogger _logger = LogManager.GetLogger("AbotLogger");

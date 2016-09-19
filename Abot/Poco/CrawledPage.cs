@@ -10,7 +10,6 @@ using AngleSharp.Dom.Html;
 
 namespace Abot.Poco
 {
-    [Serializable]
     public class CrawledPage : PageToCrawl
     {
         ILogger _logger = LogManager.GetLogger("AbotLogger");

@@ -3,7 +3,6 @@ using System.Dynamic;
 
 namespace Abot.Poco
 {
-    [Serializable]
     public class PageToCrawl
     {
         //Needed for serialization

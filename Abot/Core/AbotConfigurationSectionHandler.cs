@@ -1,40 +1,24 @@
 ﻿using Abot.Poco;
 using System;
-using System.Configuration;
 
 namespace Abot.Core
 {
-    [Serializable]
-    public class AbotConfigurationSectionHandler : ConfigurationSection
+    public class AbotConfigurationSectionHandler 
     {
-        public AbotConfigurationSectionHandler()
-        {
-            
-        }
 
-        [ConfigurationProperty("crawlBehavior")]
         public CrawlBehaviorElement CrawlBehavior
         {
-            get { return (CrawlBehaviorElement)this["crawlBehavior"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("politeness")]
         public PolitenessElement Politeness
         {
-            get { return (PolitenessElement)this["politeness"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("authorization")]
         public AuthorizationElement Authorization
         {
-            get { return (AuthorizationElement)this["authorization"]; }
-        }
-
-        [ConfigurationProperty("extensionValues")]
-        [ConfigurationCollection(typeof(ExtensionValueCollection), AddItemName = "add")]
-        public ExtensionValueCollection ExtensionValues
-        {
-            get { return (ExtensionValueCollection)this["extensionValues"]; }
+            get; set;
         }
 
         public CrawlConfiguration Convert()
@@ -52,293 +36,222 @@ namespace Abot.Core
             AutoMapper.Mapper.Map<PolitenessElement, CrawlConfiguration>(Politeness, config);
             AutoMapper.Mapper.Map<AuthorizationElement, CrawlConfiguration>(Authorization, config);
 
-            foreach (ExtensionValueElement element in ExtensionValues)
-                config.ConfigurationExtensions.Add(element.Key, element.Value);
-
             return config;
-        }
-
-        public static AbotConfigurationSectionHandler LoadFromXml()
-        {
-            return ((AbotConfigurationSectionHandler)System.Configuration.ConfigurationManager.GetSection("abot"));
         }
     }
 
-
-    [Serializable]
-    public class AuthorizationElement : ConfigurationElement
+    public class AuthorizationElement
     {
         /// <summary>
         /// Defines whatewer each request shold be autorized via login 
         /// </summary>
-        [ConfigurationProperty("isAlwaysLogin", IsRequired = false)]
         public bool IsAlwaysLogin
         {
-            get { return (bool)this["isAlwaysLogin"]; }
+            get; set;
         }
 
         /// <summary>
         /// The user name to be used for autorization 
         /// </summary>
-        [ConfigurationProperty("loginUser", IsRequired = false)]
         public string LoginUser
         {
-            get { return (string)this["loginUser"]; }
+            get; set;
         }
         /// <summary>
         /// The password to be used for autorization 
         /// </summary>
-        [ConfigurationProperty("loginPassword", IsRequired = false)]
         public string LoginPassword
         {
-            get { return (string)this["loginPassword"]; }
+            get; set;
         }
     }
-    [Serializable]
-    public class PolitenessElement : ConfigurationElement
+    public class PolitenessElement 
     {
-        [ConfigurationProperty("isRespectRobotsDotTextEnabled", IsRequired = false)]
         public bool IsRespectRobotsDotTextEnabled
         {
-            get { return (bool)this["isRespectRobotsDotTextEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isRespectMetaRobotsNoFollowEnabled", IsRequired = false)]
         public bool IsRespectMetaRobotsNoFollowEnabled
         {
-            get { return (bool)this["isRespectMetaRobotsNoFollowEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isRespectHttpXRobotsTagHeaderNoFollowEnabled", IsRequired = false)]
         public bool IsRespectHttpXRobotsTagHeaderNoFollowEnabled
         {
-            get { return (bool)this["isRespectHttpXRobotsTagHeaderNoFollowEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isRespectAnchorRelNoFollowEnabled", IsRequired = false)]
         public bool IsRespectAnchorRelNoFollowEnabled
         {
-            get { return (bool)this["isRespectAnchorRelNoFollowEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isIgnoreRobotsDotTextIfRootDisallowedEnabled", IsRequired = false)]
         public bool IsIgnoreRobotsDotTextIfRootDisallowedEnabled
         {
-            get { return (bool)this["isIgnoreRobotsDotTextIfRootDisallowedEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("robotsDotTextUserAgentString", IsRequired = false, DefaultValue = "abot")]
         public string RobotsDotTextUserAgentString
         {
-            get { return (string)this["robotsDotTextUserAgentString"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("maxRobotsDotTextCrawlDelayInSeconds", IsRequired = false, DefaultValue = 5)]
         public int MaxRobotsDotTextCrawlDelayInSeconds
         {
-            get { return (int)this["maxRobotsDotTextCrawlDelayInSeconds"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("minCrawlDelayPerDomainMilliSeconds", IsRequired = false)]
         public int MinCrawlDelayPerDomainMilliSeconds
         {
-            get { return (int)this["minCrawlDelayPerDomainMilliSeconds"]; }
+            get; set;
         }
     }
 
-    [Serializable]
-    public class CrawlBehaviorElement : ConfigurationElement
+    public class CrawlBehaviorElement
     {
-        [ConfigurationProperty("maxConcurrentThreads", IsRequired = false, DefaultValue = 10)]
+        
         public int MaxConcurrentThreads
         {
-            get { return (int)this["maxConcurrentThreads"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("maxPagesToCrawl", IsRequired = false, DefaultValue = 1000)]
+        
         public int MaxPagesToCrawl
         {
-            get { return (int)this["maxPagesToCrawl"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("maxPagesToCrawlPerDomain", IsRequired = false)]
+        
         public int MaxPagesToCrawlPerDomain
         {
-            get { return (int)this["maxPagesToCrawlPerDomain"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("maxPageSizeInBytes", IsRequired = false)]
         public int MaxPageSizeInBytes
         {
-            get { return (int)this["maxPageSizeInBytes"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("userAgentString", IsRequired = false, DefaultValue = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko")]
         public string UserAgentString
         {
-            get { return (string)this["userAgentString"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("crawlTimeoutSeconds", IsRequired = false)]
         public int CrawlTimeoutSeconds
         {
-            get { return (int)this["crawlTimeoutSeconds"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("downloadableContentTypes", IsRequired = false, DefaultValue = "text/html")]
         public string DownloadableContentTypes
         {
-            get { return (string)this["downloadableContentTypes"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isUriRecrawlingEnabled", IsRequired = false)]
         public bool IsUriRecrawlingEnabled
         {
-            get { return (bool)this["isUriRecrawlingEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isExternalPageCrawlingEnabled", IsRequired = false)]
         public bool IsExternalPageCrawlingEnabled
         {
-            get { return (bool)this["isExternalPageCrawlingEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isExternalPageLinksCrawlingEnabled", IsRequired = false)]
         public bool IsExternalPageLinksCrawlingEnabled
         {
-            get { return (bool)this["isExternalPageLinksCrawlingEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isSslCertificateValidationEnabled", IsRequired = false, DefaultValue = true)]
         public bool IsSslCertificateValidationEnabled
         {
-            get { return (bool)this["isSslCertificateValidationEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("httpServicePointConnectionLimit", IsRequired = false, DefaultValue = 200)]
         public int HttpServicePointConnectionLimit
         {
-            get { return (int)this["httpServicePointConnectionLimit"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("httpRequestTimeoutInSeconds", IsRequired = false, DefaultValue = 15)]
         public int HttpRequestTimeoutInSeconds
         {
-            get { return (int)this["httpRequestTimeoutInSeconds"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("httpRequestMaxAutoRedirects", IsRequired = false, DefaultValue = 7)]
+        
         public int HttpRequestMaxAutoRedirects
         {
-            get { return (int)this["httpRequestMaxAutoRedirects"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("isHttpRequestAutoRedirectsEnabled", IsRequired = false, DefaultValue = true)]
+        
         public bool IsHttpRequestAutoRedirectsEnabled
         {
-            get { return (bool)this["isHttpRequestAutoRedirectsEnabled"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("isHttpRequestAutomaticDecompressionEnabled", IsRequired = false)]
+        
         public bool IsHttpRequestAutomaticDecompressionEnabled
         {
-            get { return (bool)this["isHttpRequestAutomaticDecompressionEnabled"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("isSendingCookiesEnabled", IsRequired = false)]
+        
         public bool IsSendingCookiesEnabled
         {
-            get { return (bool)this["isSendingCookiesEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("isRespectUrlNamedAnchorOrHashbangEnabled", IsRequired = false)]
         public bool IsRespectUrlNamedAnchorOrHashbangEnabled
         {
-            get { return (bool)this["isRespectUrlNamedAnchorOrHashbangEnabled"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("minAvailableMemoryRequiredInMb", IsRequired = false)]
         public int MinAvailableMemoryRequiredInMb
         {
-            get { return (int)this["minAvailableMemoryRequiredInMb"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("maxMemoryUsageInMb", IsRequired = false)]
         public int MaxMemoryUsageInMb
         {
-            get { return (int)this["maxMemoryUsageInMb"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("maxMemoryUsageCacheTimeInSeconds", IsRequired = false)]
         public int MaxMemoryUsageCacheTimeInSeconds
         {
-            get { return (int)this["maxMemoryUsageCacheTimeInSeconds"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("maxCrawlDepth", IsRequired = false, DefaultValue = 100)]
+        
         public int MaxCrawlDepth
         {
-            get { return (int)this["maxCrawlDepth"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("maxLinksPerPage", IsRequired = false, DefaultValue = 0)]
+        
         public int MaxLinksPerPage
         {
-            get { return (int)this["maxLinksPerPage"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("isForcedLinkParsingEnabled", IsRequired = false)]
+        
         public bool IsForcedLinkParsingEnabled
         {
-            get { return (bool)this["isForcedLinkParsingEnabled"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("maxRetryCount", IsRequired = false)]
+        
         public int MaxRetryCount
         {
-            get { return (int)this["maxRetryCount"]; }
+            get; set;
         }
-
-        [ConfigurationProperty("minRetryDelayInMilliseconds", IsRequired = false)]
+        
         public int MinRetryDelayInMilliseconds
         {
-            get { return (int)this["minRetryDelayInMilliseconds"]; }
+            get; set;
         }
     }
 
-    [Serializable]
-    public class ExtensionValueElement : ConfigurationElement
+    public class ExtensionValueElement
     {
-        [ConfigurationProperty("key", IsRequired = false, IsKey = true)]
         public string Key
         {
-            get { return (string)this["key"]; }
+            get; set;
         }
 
-        [ConfigurationProperty("value", IsRequired = false, IsKey = false)]
         public string Value
         {
-            get { return (string)this["value"]; }
-        }
-
-    }
-
-    [Serializable]
-    public class ExtensionValueCollection : ConfigurationElementCollection
-    {
-        public ExtensionValueElement this[int index]
-        {
-            get { return (ExtensionValueElement)BaseGet(index); }
-        }
-
-        protected override ConfigurationElement CreateNewElement()
-        {
-            return new ExtensionValueElement();
-        }
-
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            return ((ExtensionValueElement)element).Key;
+            get; set;
         }
     }
 }

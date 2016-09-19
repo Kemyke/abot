@@ -1,6 +1,7 @@
 ﻿using Abot.Poco;
 using HtmlAgilityPack;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Abot.Core
@@ -9,7 +10,6 @@ namespace Abot.Core
     /// <summary>
     /// Parser that uses Html Agility Pack http://htmlagilitypack.codeplex.com/ to parse page links
     /// </summary>
-    [Serializable]
     public class HapHyperLinkParser : HyperLinkParser
     {
         protected override string ParserType
@@ -56,9 +56,9 @@ namespace Abot.Core
             if (HasRobotsNoFollow(crawledPage))
                 return hrefValues;
 
-            HtmlNodeCollection aTags = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
-            HtmlNodeCollection areaTags = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//area[@href]");
-            HtmlNodeCollection canonicals = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//link[@rel='canonical'][@href]");
+            var aTags = crawledPage.HtmlDocument.DocumentNode.Descendants("a");
+            var areaTags = crawledPage.HtmlDocument.DocumentNode.Descendants("area");
+            var canonicals = crawledPage.HtmlDocument.DocumentNode.Descendants("link").Where(n => n.GetAttributeValue("rel", "") == "canonical");
 
             hrefValues.AddRange(GetLinks(aTags));
             hrefValues.AddRange(GetLinks(areaTags));
@@ -70,7 +70,7 @@ namespace Abot.Core
         protected override string GetBaseHrefValue(CrawledPage crawledPage)
         {
             string hrefValue = "";
-            HtmlNode node = crawledPage.HtmlDocument.DocumentNode.SelectSingleNode("//base");
+            HtmlNode node = crawledPage.HtmlDocument.DocumentNode.Descendants("base").Single();
 
             //Must use node.InnerHtml instead of node.InnerText since "aaa<br />bbb" will be returned as "aaabbb"
             if (node != null)
@@ -82,14 +82,14 @@ namespace Abot.Core
         protected override string GetMetaRobotsValue(CrawledPage crawledPage)
         {
             string robotsMeta = null;
-            HtmlNode robotsNode = crawledPage.HtmlDocument.DocumentNode.SelectSingleNode("//meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='robots']");
+            HtmlNode robotsNode = crawledPage.HtmlDocument.DocumentNode.Descendants("meta").Single(n => n.GetAttributeValue("name", "").ToLower() == "robots");
             if (robotsNode != null)
                 robotsMeta = robotsNode.GetAttributeValue("content", "");
 
             return robotsMeta;
         }
 
-        protected virtual List<string> GetLinks(HtmlNodeCollection nodes)
+        protected virtual List<string> GetLinks(IEnumerable<HtmlNode> nodes)
         {
             List<string> hrefs = new List<string>();
 

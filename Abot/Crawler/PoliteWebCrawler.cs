@@ -26,7 +26,6 @@ namespace Abot.Crawler
     /// <summary>
     /// Extends the WebCrawler class and added politeness features like crawl delays and respecting robots.txt files. 
     /// </summary>
-    [Serializable]
     public class PoliteWebCrawler : WebCrawler, IPoliteWebCrawler
     {
         private static ILogger _logger = LogManager.GetLogger("AbotLogger");

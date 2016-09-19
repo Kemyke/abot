@@ -3,7 +3,6 @@ using System;
 
 namespace Abot.Poco
 {
-    [Serializable]
     public class CrawlDecision
     {
         public CrawlDecision()

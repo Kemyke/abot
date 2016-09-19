@@ -3,7 +3,6 @@ using System.Text;
 
 namespace Abot.Poco
 {
-    [Serializable]
     public class PageContent
     {
         public PageContent()
