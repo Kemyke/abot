@@ -9,7 +9,6 @@ namespace Abot.Demo
     {
         static void Main(string[] args)
         {
-            log4net.Config.XmlConfigurator.Configure();
             PrintDisclaimer();
 
             Uri uriToCrawl = GetSiteToCrawl(args);

@@ -5,13 +5,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Abot.Poco;
 using Abot.Util;
-using log4net;
+using NLog;
 
 namespace Abot.Crawler
 {
     public class AsyncWebCrawler : WebCrawler
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = LogManager.GetLogger("AbotLogger");
 
         protected virtual void CrawlSite()
         {

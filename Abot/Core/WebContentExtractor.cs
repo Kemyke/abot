@@ -1,6 +1,6 @@
 ﻿
 using Abot.Poco;
-using log4net;
+using NLog;
 using System;
 using System.IO;
 using System.Net;
@@ -17,7 +17,7 @@ namespace Abot.Core
     [Serializable]
     public class WebContentExtractor : IWebContentExtractor
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = LogManager.GetLogger("AbotLogger");
 
         public virtual PageContent GetContent(WebResponse response)
         {
@@ -126,7 +126,7 @@ namespace Abot.Core
             }
             catch (Exception e)
             {
-                _logger.WarnFormat("Error occurred while downloading content of url {0}", webResponse.ResponseUri.AbsoluteUri);
+                _logger.Warn("Error occurred while downloading content of url {0}", webResponse.ResponseUri.AbsoluteUri);
                 _logger.Warn(e);
             }
 

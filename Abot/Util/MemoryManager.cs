@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using NLog;
 using System;
 using System.Runtime;
 
@@ -23,7 +23,7 @@ namespace Abot.Util
     [Serializable]
     public class MemoryManager : IMemoryManager
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = LogManager.GetLogger("AbotLogger");
         IMemoryMonitor _memoryMonitor;
 
         public MemoryManager(IMemoryMonitor memoryMonitor)

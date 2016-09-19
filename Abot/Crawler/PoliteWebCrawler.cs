@@ -1,6 +1,6 @@
 ﻿using Abot.Core;
 using Abot.Poco;
-using log4net;
+using NLog;
 using System;
 using Robots;
 
@@ -29,7 +29,7 @@ namespace Abot.Crawler
     [Serializable]
     public class PoliteWebCrawler : WebCrawler, IPoliteWebCrawler
     {
-        private static ILog _logger = LogManager.GetLogger("AbotLogger");
+        private static ILogger _logger = LogManager.GetLogger("AbotLogger");
         protected IDomainRateLimiter _domainRateLimiter;
         protected IRobotsDotTextFinder _robotsDotTextFinder;
         protected IRobotsDotText _robotsDotText;
@@ -85,13 +85,13 @@ namespace Abot.Crawler
             {
                 if (robotsDotTextCrawlDelayInSecs > _crawlContext.CrawlConfiguration.MaxRobotsDotTextCrawlDelayInSeconds)
                 {
-                    _logger.WarnFormat("[{0}] robot.txt file directive [Crawl-delay: {1}] is above the value set in the config value MaxRobotsDotTextCrawlDelay, will use MaxRobotsDotTextCrawlDelay value instead.", uri, _crawlContext.CrawlConfiguration.MaxRobotsDotTextCrawlDelayInSeconds);
+                    _logger.Warn("[{0}] robot.txt file directive [Crawl-delay: {1}] is above the value set in the config value MaxRobotsDotTextCrawlDelay, will use MaxRobotsDotTextCrawlDelay value instead.", uri, _crawlContext.CrawlConfiguration.MaxRobotsDotTextCrawlDelayInSeconds);
 
                     robotsDotTextCrawlDelayInSecs = _crawlContext.CrawlConfiguration.MaxRobotsDotTextCrawlDelayInSeconds;
                     robotsDotTextCrawlDelayInMillisecs = robotsDotTextCrawlDelayInSecs * 1000;
                 }
 
-                _logger.WarnFormat("[{0}] robot.txt file directive [Crawl-delay: {1}] will be respected.", uri, robotsDotTextCrawlDelayInSecs);
+                _logger.Warn("[{0}] robot.txt file directive [Crawl-delay: {1}] will be respected.", uri, robotsDotTextCrawlDelayInSecs);
                 _domainRateLimiter.AddDomain(uri, robotsDotTextCrawlDelayInMillisecs);
             }
 
@@ -120,14 +120,14 @@ namespace Abot.Crawler
                 if (!allowedByRobots)
                 {
                     string message = string.Format("Page [{0}] [Disallowed by robots.txt file], however since IsIgnoreRobotsDotTextIfRootDisallowedEnabled is set to true the robots.txt file will be ignored for this site.", pageToCrawl.Uri.AbsoluteUri);
-                    _logger.DebugFormat(message);
+                    _logger.Debug(message);
                     allowedByRobots = true;
                     _robotsDotText = null;
                 }
                 else if (!allPathsBelowRootAllowedByRobots)
                 {
                     string message = string.Format("All Pages below [{0}] [Disallowed by robots.txt file], however since IsIgnoreRobotsDotTextIfRootDisallowedEnabled is set to true the robots.txt file will be ignored for this site.", pageToCrawl.Uri.AbsoluteUri);
-                    _logger.DebugFormat(message);
+                    _logger.Debug(message);
                     allowedByRobots = true;
                     _robotsDotText = null;
                 }
@@ -136,7 +136,7 @@ namespace Abot.Crawler
             else if (!allowedByRobots)
             {
                 string message = string.Format("Page [{0}] not crawled, [Disallowed by robots.txt file], set IsRespectRobotsDotText=false in config file if you would like to ignore robots.txt files.", pageToCrawl.Uri.AbsoluteUri);
-                _logger.DebugFormat(message);
+                _logger.Debug(message);
 
                 FirePageCrawlDisallowedEventAsync(pageToCrawl, message);
                 FirePageCrawlDisallowedEvent(pageToCrawl, message);

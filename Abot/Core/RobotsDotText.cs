@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using NLog;
 using Robots;
 using System;
 
@@ -30,7 +30,7 @@ namespace Abot.Core
     [Serializable]
     public class RobotsDotText : IRobotsDotText
     {
-        ILog _logger = LogManager.GetLogger("AbotLogger");
+        ILogger _logger = LogManager.GetLogger("AbotLogger");
         IRobots _robotsDotTextUtil = null;
         Uri _rootUri = null;
 

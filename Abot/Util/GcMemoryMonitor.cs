@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using NLog;
 using System;
 using System.Diagnostics;
 
@@ -12,7 +12,7 @@ namespace Abot.Util
     [Serializable]
     public class GcMemoryMonitor : IMemoryMonitor
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = LogManager.GetLogger("AbotLogger");
 
         public virtual int GetCurrentUsageInMb()
         {
@@ -20,7 +20,7 @@ namespace Abot.Util
             int currentUsageInMb = Convert.ToInt32(GC.GetTotalMemory(false) / (1024 * 1024));
             timer.Stop();
 
-            _logger.DebugFormat("GC reporting [{0}mb] currently thought to be allocated, took [{1}] millisecs", currentUsageInMb, timer.ElapsedMilliseconds);
+            _logger.Debug("GC reporting [{0}mb] currently thought to be allocated, took [{1}] millisecs", currentUsageInMb, timer.ElapsedMilliseconds);
 
             return currentUsageInMb;       
         }

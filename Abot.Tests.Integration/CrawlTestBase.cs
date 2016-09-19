@@ -1,6 +1,6 @@
 ﻿using Abot.Crawler;
 using Abot.Poco;
-using log4net;
+using NLog;
 using NUnit.Framework;
 using System;
 using System.Collections.Concurrent;
@@ -12,7 +12,7 @@ namespace Abot.Tests.Integration
     [TestFixture]
     public abstract class CrawlTestBase
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = LogManager.GetLogger("AbotLogger");
         ConcurrentBag<PageResult> _actualCrawledPages = new ConcurrentBag<PageResult>();
         int _maxSecondsToCrawl;
         Uri _rootUri;
@@ -56,15 +56,15 @@ namespace Abot.Tests.Integration
 
             foreach (Discrepancy discrepancy in missingPages)
             {
-                _logger.InfoFormat("Missing:[{0}][{1}]", discrepancy.Expected.Url, discrepancy.Expected.HttpStatusCode);
+                _logger.Info("Missing:[{0}][{1}]", discrepancy.Expected.Url, discrepancy.Expected.HttpStatusCode);
             }
             foreach (Discrepancy discrepancy in unexpectedHttpStatusPages)
             {
-                _logger.InfoFormat("Unexpected Http Status: [{0}] Expected:[{1}] Actual:[{2}]", discrepancy.Actual.Url, discrepancy.Expected.HttpStatusCode, discrepancy.Actual.HttpStatusCode);
+                _logger.Info("Unexpected Http Status: [{0}] Expected:[{1}] Actual:[{2}]", discrepancy.Actual.Url, discrepancy.Expected.HttpStatusCode, discrepancy.Actual.HttpStatusCode);
             }
             foreach(Discrepancy discrepancy in unexpectedPages)
             {
-                _logger.InfoFormat("Unexpected Page:[{0}][{1}]", discrepancy.Actual.Url, discrepancy.Actual.HttpStatusCode);
+                _logger.Info("Unexpected Page:[{0}][{1}]", discrepancy.Actual.Url, discrepancy.Actual.HttpStatusCode);
             }
         }
 

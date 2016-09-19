@@ -1,5 +1,5 @@
 ﻿using HtmlAgilityPack;
-using log4net;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -13,7 +13,7 @@ namespace Abot.Poco
     [Serializable]
     public class CrawledPage : PageToCrawl
     {
-        ILog _logger = LogManager.GetLogger("AbotLogger");
+        ILogger _logger = LogManager.GetLogger("AbotLogger");
 
         Lazy<HtmlDocument> _htmlDocument;
         Lazy<IHtmlDocument> _csQueryDocument;
@@ -128,7 +128,7 @@ namespace Abot.Poco
             {
                 csQueryObject = parser.Parse("");
 
-                _logger.ErrorFormat("Error occurred while loading CsQuery object for Url [{0}]", Uri);
+                _logger.Error("Error occurred while loading CsQuery object for Url [{0}]", Uri);
                 _logger.Error(e);
             }
             return csQueryObject;
@@ -146,7 +146,7 @@ namespace Abot.Poco
             {
                 hapDoc.LoadHtml("");
 
-                _logger.ErrorFormat("Error occurred while loading HtmlAgilityPack object for Url [{0}]", Uri);
+                _logger.Error("Error occurred while loading HtmlAgilityPack object for Url [{0}]", Uri);
                 _logger.Error(e);
             }
             return hapDoc;

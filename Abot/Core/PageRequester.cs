@@ -1,12 +1,11 @@
 ﻿using Abot.Poco;
-using log4net;
+using NLog;
 using System;
 using System.CodeDom;
 using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using log4net.Core;
 
 namespace Abot.Core
 {
@@ -31,7 +30,7 @@ namespace Abot.Core
     [Serializable]
     public class PageRequester : IPageRequester
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = LogManager.GetLogger("AbotLogger");
 
         protected CrawlConfiguration _config;
         protected IWebContentExtractor _extractor;
@@ -94,12 +93,12 @@ namespace Abot.Core
                 if (e.Response != null)
                     response = (HttpWebResponse)e.Response;
 
-                _logger.DebugFormat("Error occurred requesting url [{0}]", uri.AbsoluteUri);
+                _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
                 _logger.Debug(e);
             }
             catch (Exception e)
             {
-                _logger.DebugFormat("Error occurred requesting url [{0}]", uri.AbsoluteUri);
+                _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
                 _logger.Debug(e);
             }
             finally
@@ -120,7 +119,7 @@ namespace Abot.Core
                         }
                         else
                         {
-                            _logger.DebugFormat("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
+                            _logger.Debug("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
                         }
 
                         response.Close();//Should already be closed by _extractor but just being safe
@@ -128,7 +127,7 @@ namespace Abot.Core
                 }
                 catch (Exception e)
                 {
-                    _logger.DebugFormat("Error occurred finalizing requesting url [{0}]", uri.AbsoluteUri);
+                    _logger.Debug("Error occurred finalizing requesting url [{0}]", uri.AbsoluteUri);
                     _logger.Debug(e);
                 }
             }
