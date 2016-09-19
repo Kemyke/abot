@@ -1,10 +1,12 @@
-﻿using CsQuery;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
+using AngleSharp;
+using AngleSharp.Parser.Html;
+using AngleSharp.Dom.Html;
 
 namespace Abot.Poco
 {
@@ -14,13 +16,13 @@ namespace Abot.Poco
         ILog _logger = LogManager.GetLogger("AbotLogger");
 
         Lazy<HtmlDocument> _htmlDocument;
-        Lazy<CQ> _csQueryDocument;
+        Lazy<IHtmlDocument> _csQueryDocument;
 
         public CrawledPage(Uri uri)
             : base(uri)
         {
             _htmlDocument = new Lazy<HtmlDocument>(() => InitializeHtmlAgilityPackDocument() );
-            _csQueryDocument = new Lazy<CQ>(() => InitializeCsQueryDocument());
+            _csQueryDocument = new Lazy<IHtmlDocument>(() => InitializeCsQueryDocument());
             Content = new PageContent();
         }
 
@@ -38,7 +40,7 @@ namespace Abot.Poco
         /// <summary>
         /// Lazy loaded CsQuery (https://github.com/jamietre/CsQuery) document that can be used to retrieve/modify html elements on the crawled page.
         /// </summary>
-        public CQ CsQueryDocument { get { return _csQueryDocument.Value;  } }
+        public IHtmlDocument CsQueryDocument { get { return _csQueryDocument.Value;  } }
 
         /// <summary>
         /// Web request sent to the server
@@ -113,16 +115,18 @@ namespace Abot.Poco
             }
         }
 
-        private CQ InitializeCsQueryDocument()
+        private IHtmlDocument InitializeCsQueryDocument()
         {
-            CQ csQueryObject;
+            IHtmlDocument csQueryObject;
+            HtmlParser parser = new HtmlParser();
+
             try
             {
-                csQueryObject = CQ.Create(Content.Text);
+                csQueryObject = parser.Parse(Content.Text);
             }
             catch (Exception e)
             {
-                csQueryObject = CQ.Create("");
+                csQueryObject = parser.Parse("");
 
                 _logger.ErrorFormat("Error occurred while loading CsQuery object for Url [{0}]", Uri);
                 _logger.Error(e);
@@ -133,7 +137,7 @@ namespace Abot.Poco
         private HtmlDocument InitializeHtmlAgilityPackDocument()
         {
             HtmlDocument hapDoc = new HtmlDocument();
-            hapDoc.OptionMaxNestedChildNodes = 5000;//did not make this an externally configurable property since it is really an internal issue to hap
+            //hapDoc.OptionMaxNestedChildNodes = 5000;//did not make this an externally configurable property since it is really an internal issue to hap
             try
             {
                 hapDoc.LoadHtml(Content.Text);

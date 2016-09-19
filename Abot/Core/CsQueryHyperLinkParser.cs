@@ -1,5 +1,5 @@
 ﻿using Abot.Poco;
-using CsQuery;
+using AngleSharp.Dom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,40 +55,38 @@ namespace Abot.Core
             if (HasRobotsNoFollow(crawledPage))
                 return null;
 
-            IEnumerable<string> hrefValues = crawledPage.CsQueryDocument.Select("a, area")
-            .Elements
+            IEnumerable<string> hrefValues = crawledPage.CsQueryDocument.QuerySelectorAll("a, area")
             .Where(e => !HasRelNoFollow(e))
             .Select(y => y.GetAttribute("href"))
             .Where(a => !string.IsNullOrWhiteSpace(a));
 
-            IEnumerable<string> canonicalHref = crawledPage.CsQueryDocument.
-                Select("link").Elements.
-                Where(e => HasRelCanonicalPointingToDifferentUrl(e, crawledPage.Uri.ToString())).
-                Select(e => e.Attributes["href"]);
+            IEnumerable<string> canonicalHref = crawledPage.CsQueryDocument.QuerySelectorAll("link")
+                .Where(e => HasRelCanonicalPointingToDifferentUrl(e, crawledPage.Uri.ToString()))
+                .Select(e => e.Attributes["href"].Value);
 
             return hrefValues.Concat(canonicalHref);
         }
 
         protected override string GetBaseHrefValue(CrawledPage crawledPage)
         {
-            string baseTagValue = crawledPage.CsQueryDocument.Select("base").Attr("href") ?? "";
+            string baseTagValue = crawledPage.CsQueryDocument.QuerySelector("base").Attributes["href"].Value ?? "";
             return baseTagValue.Trim();
         }
 
         protected override string GetMetaRobotsValue(CrawledPage crawledPage)
         {
-            return crawledPage.CsQueryDocument["meta[name]"].Filter(d => d.Name.ToLowerInvariant() == "robots").Attr("content");
+            return crawledPage.CsQueryDocument.QuerySelectorAll("meta[name]").FirstOrDefault(d => d.NodeName.ToLowerInvariant() == "robots")?.Attributes["content"].Value;
         }
 
-        protected virtual bool HasRelCanonicalPointingToDifferentUrl(IDomElement e, string orginalUrl)
+        protected virtual bool HasRelCanonicalPointingToDifferentUrl(IElement e, string orginalUrl)
         {
-            return e.HasAttribute("rel") && !string.IsNullOrWhiteSpace(e.Attributes["rel"]) &&
-                    string.Equals(e.Attributes["rel"], "canonical", StringComparison.OrdinalIgnoreCase) &&
-                    e.HasAttribute("href") && !string.IsNullOrWhiteSpace(e.Attributes["href"]) &&
-                    !string.Equals(e.Attributes["href"], orginalUrl, StringComparison.OrdinalIgnoreCase);
+            return e.HasAttribute("rel") && !string.IsNullOrWhiteSpace(e.Attributes["rel"].Value) &&
+                    string.Equals(e.Attributes["rel"].Value, "canonical", StringComparison.OrdinalIgnoreCase) &&
+                    e.HasAttribute("href") && !string.IsNullOrWhiteSpace(e.Attributes["href"].Value) &&
+                    !string.Equals(e.Attributes["href"].Value, orginalUrl, StringComparison.OrdinalIgnoreCase);
         }
 
-        protected virtual bool HasRelNoFollow(IDomElement e)
+        protected virtual bool HasRelNoFollow(IElement e)
         {
             return _config.IsRespectAnchorRelNoFollowEnabled && (e.HasAttribute("rel") && e.GetAttribute("rel").ToLower().Trim() == "nofollow");
         }

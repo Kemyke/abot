@@ -108,3 +108,5 @@ Backup*/
 UpgradeLog*.XML
 Settings.StyleCop
 .vs/config/applicationhost.config
+/Abot/project.lock.json
+/.vs/restore.dg
