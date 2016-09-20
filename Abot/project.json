@@ -5,7 +5,10 @@
     "AngleSharp": "0.9.8.1",
     "NLog": "4.4.0-betaV15",
     "HtmlAgilityPack": "1.4.9.5",
-    "NRobotsCore": "1.1.0"
+    "NRobotsCore": "1.1.0",
+    "Microsoft.DotNet.InternalAbstractions": "1.0.1-beta-003206",
+    "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0"
   },
   "frameworks": {
     //"net451": {

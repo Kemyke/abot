@@ -1,24 +1,30 @@
 ﻿using Abot.Poco;
+using Microsoft.Extensions.Configuration;
 using System;
 
 namespace Abot.Core
 {
     public class AbotConfigurationSectionHandler 
     {
+        private IConfigurationRoot config;
+        public AbotConfigurationSectionHandler(IConfigurationRoot cr)
+        {
+            config = cr;
+        }
 
         public CrawlBehaviorElement CrawlBehavior
         {
-            get; set;
+            get { return new CrawlBehaviorElement(config); }
         }
 
         public PolitenessElement Politeness
         {
-            get; set;
+            get { return new PolitenessElement(config); }
         }
 
         public AuthorizationElement Authorization
         {
-            get; set;
+            get { return new AuthorizationElement(config); }
         }
 
         public CrawlConfiguration Convert()
@@ -42,12 +48,18 @@ namespace Abot.Core
 
     public class AuthorizationElement
     {
+        private IConfigurationSection config;
+        public AuthorizationElement(IConfigurationRoot cr)
+        {
+            config = cr.GetSection("Authorization");
+        }
+
         /// <summary>
         /// Defines whatewer each request shold be autorized via login 
         /// </summary>
         public bool IsAlwaysLogin
         {
-            get; set;
+            get { return bool.Parse(config["IsAlwaysLogin"]); }
         }
 
         /// <summary>
@@ -55,203 +67,221 @@ namespace Abot.Core
         /// </summary>
         public string LoginUser
         {
-            get; set;
+            get { return config["LoginUser"]; }
         }
         /// <summary>
         /// The password to be used for autorization 
         /// </summary>
         public string LoginPassword
         {
-            get; set;
+            get { return config["LoginPassword"]; }
         }
     }
     public class PolitenessElement 
     {
+        private IConfigurationSection config;
+        public PolitenessElement(IConfigurationRoot cr)
+        {
+            config = cr.GetSection("Politeness");
+        }
+
         public bool IsRespectRobotsDotTextEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsRespectRobotsDotTextEnabled"]); }
         }
 
         public bool IsRespectMetaRobotsNoFollowEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsRespectMetaRobotsNoFollowEnabled"]); }
         }
 
         public bool IsRespectHttpXRobotsTagHeaderNoFollowEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsRespectHttpXRobotsTagHeaderNoFollowEnabled"]); }
         }
 
         public bool IsRespectAnchorRelNoFollowEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsRespectAnchorRelNoFollowEnabled"]); }
         }
 
         public bool IsIgnoreRobotsDotTextIfRootDisallowedEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsIgnoreRobotsDotTextIfRootDisallowedEnabled"]); }
         }
 
         public string RobotsDotTextUserAgentString
         {
-            get; set;
+            get { return config["RobotsDotTextUserAgentString"]; }
         }
 
         public int MaxRobotsDotTextCrawlDelayInSeconds
         {
-            get; set;
+            get { return int.Parse(config["MaxRobotsDotTextCrawlDelayInSeconds"]); }
         }
 
         public int MinCrawlDelayPerDomainMilliSeconds
         {
-            get; set;
+            get { return int.Parse(config["MinCrawlDelayPerDomainMilliSeconds"]); }
         }
     }
 
     public class CrawlBehaviorElement
     {
-        
+        private IConfigurationSection config;
+        public CrawlBehaviorElement(IConfigurationRoot cr)
+        {
+            config = cr.GetSection("CrawlBehavior");
+        }
+
+
         public int MaxConcurrentThreads
         {
-            get; set;
+            get { return int.Parse(config["MaxConcurrentThreads"]); }
         }
         
         public int MaxPagesToCrawl
         {
-            get; set;
+            get { return int.Parse(config["MaxConcurrentThreads"]); }
         }
         
         public int MaxPagesToCrawlPerDomain
         {
-            get; set;
+            get { return int.Parse(config["MaxConcurrentThreads"]); }
         }
 
         public int MaxPageSizeInBytes
         {
-            get; set;
+            get { return int.Parse(config["MaxConcurrentThreads"]); }
         }
 
         public string UserAgentString
         {
-            get; set;
+            get { return config["UserAgentString"]; }
         }
 
         public int CrawlTimeoutSeconds
         {
-            get; set;
+            get { return int.Parse(config["CrawlTimeoutSeconds"]); }
         }
 
         public string DownloadableContentTypes
         {
-            get; set;
+            get { return config["DownloadableContentTypes"]; }
         }
 
         public bool IsUriRecrawlingEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsUriRecrawlingEnabled"]); }
         }
 
         public bool IsExternalPageCrawlingEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsExternalPageCrawlingEnabled"]); }
         }
 
         public bool IsExternalPageLinksCrawlingEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsExternalPageLinksCrawlingEnabled"]); }
         }
 
         public bool IsSslCertificateValidationEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsSslCertificateValidationEnabled"]); }
         }
 
         public int HttpServicePointConnectionLimit
         {
-            get; set;
+            get { return int.Parse(config["HttpServicePointConnectionLimit"]); }
         }
 
         public int HttpRequestTimeoutInSeconds
         {
-            get; set;
+            get { return int.Parse(config["HttpRequestTimeoutInSeconds"]); }
         }
         
         public int HttpRequestMaxAutoRedirects
         {
-            get; set;
+            get { return int.Parse(config["HttpRequestMaxAutoRedirects"]); }
         }
         
         public bool IsHttpRequestAutoRedirectsEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsHttpRequestAutoRedirectsEnabled"]); }
         }
         
         public bool IsHttpRequestAutomaticDecompressionEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsHttpRequestAutomaticDecompressionEnabled"]); }
         }
         
         public bool IsSendingCookiesEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsSendingCookiesEnabled"]); }
         }
 
         public bool IsRespectUrlNamedAnchorOrHashbangEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsRespectUrlNamedAnchorOrHashbangEnabled"]); }
         }
 
         public int MinAvailableMemoryRequiredInMb
         {
-            get; set;
+            get { return int.Parse(config["MinAvailableMemoryRequiredInMb"]); }
         }
 
         public int MaxMemoryUsageInMb
         {
-            get; set;
+            get { return int.Parse(config["MaxMemoryUsageInMb"]); }
         }
 
         public int MaxMemoryUsageCacheTimeInSeconds
         {
-            get; set;
+            get { return int.Parse(config["MaxMemoryUsageCacheTimeInSeconds"]); }
         }
         
         public int MaxCrawlDepth
         {
-            get; set;
+            get { return int.Parse(config["MaxCrawlDepth"]); }
         }
         
         public int MaxLinksPerPage
         {
-            get; set;
+            get { return int.Parse(config["MaxLinksPerPage"]); }
         }
         
         public bool IsForcedLinkParsingEnabled
         {
-            get; set;
+            get { return bool.Parse(config["IsForcedLinkParsingEnabled"]); }
         }
         
         public int MaxRetryCount
         {
-            get; set;
+            get { return int.Parse(config["MaxRetryCount"]); }
         }
         
         public int MinRetryDelayInMilliseconds
         {
-            get; set;
+            get { return int.Parse(config["MinRetryDelayInMilliseconds"]); }
         }
     }
 
     public class ExtensionValueElement
     {
+        private IConfigurationSection config;
+        public ExtensionValueElement(IConfigurationRoot cr)
+        {
+            config = cr.GetSection("ExtensionValue");
+        }
+
         public string Key
         {
-            get; set;
+            get { return config["Key"]; }
         }
 
         public string Value
         {
-            get; set;
+            get { return config["Value"]; }
         }
     }
 }

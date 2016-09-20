@@ -205,7 +205,7 @@ namespace Abot.Core
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
-            request.UserAgent = _config.UserAgentString;
+            request.Headers["User-Agent"] = _config.UserAgentString;
             request.Accept = "*/*";
 
             if (_config.HttpRequestMaxAutoRedirects > 0)

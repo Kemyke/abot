@@ -75,7 +75,7 @@ namespace Abot.Poco
 
         /// <summary>Constructs a response based on custom parameters.</summary>
         /// <remarks>Recieves parameters neccesarily set for Abot to work.</remarks>
-        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, NameValueCollection headers)
+        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, WebHeaderCollection headers)
         {
             StatusCode = statusCode;
             Headers = headers;
@@ -99,7 +99,7 @@ namespace Abot.Poco
         /// <summary>Server designated length of content in bytes</summary>
         public long ContentLength { get; set; }
         /// <summary>Collection of headers in the response</summary>
-        public NameValueCollection Headers { get; set; }
+        public WebHeaderCollection Headers { get; set; }
         /// <summary>Gets the character set of the response.</summary>
         public string CharacterSet { get; set; }
         /// <summary>Gets the method that is used to encode the body of the response.</summary>

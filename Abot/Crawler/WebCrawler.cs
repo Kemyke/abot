@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Reflection;
 using System.Threading;
-using System.Timers;
 using Abot.Core;
 using Abot.Poco;
 using Abot.Util;
 using AutoMapper;
+using Microsoft.DotNet.InternalAbstractions;
+using Microsoft.Extensions.Configuration;
 using NLog;
-using Timer = System.Timers.Timer;
 
 namespace Abot.Crawler
 {
@@ -138,24 +138,6 @@ namespace Abot.Crawler
 
         static WebCrawler()
         {
-            //This is a workaround for dealing with periods in urls (http://stackoverflow.com/questions/856885/httpwebrequest-to-url-with-dot-at-the-end)
-            //Will not be needed when this project is upgraded to 4.5
-            MethodInfo getSyntax = typeof(UriParser).GetMethod("GetSyntax", BindingFlags.Static | BindingFlags.NonPublic);
-            FieldInfo flagsField = typeof(UriParser).GetField("m_Flags", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (getSyntax != null && flagsField != null)
-            {
-                foreach (string scheme in new[] { "http", "https" })
-                {
-                    UriParser parser = (UriParser)getSyntax.Invoke(null, new object[] { scheme });
-                    if (parser != null)
-                    {
-                        int flagsValue = (int)flagsField.GetValue(parser);
-                        // Clear the CanonicalizeAsFilePath attribute
-                        if ((flagsValue & 0x1000000) != 0)
-                            flagsField.SetValue(parser, flagsValue & ~0x1000000);
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -245,9 +227,7 @@ namespace Abot.Crawler
 
             if (_crawlContext.CrawlConfiguration.CrawlTimeoutSeconds > 0)
             {
-                _timeoutTimer = new Timer(_crawlContext.CrawlConfiguration.CrawlTimeoutSeconds * 1000);
-                _timeoutTimer.Elapsed += HandleCrawlTimeout;
-                _timeoutTimer.Start();
+                _timeoutTimer = new Timer(HandleCrawlTimeout, null, 0, _crawlContext.CrawlConfiguration.CrawlTimeoutSeconds * 1000);
             }
 
             try
@@ -271,8 +251,7 @@ namespace Abot.Crawler
                     _threadManager.Dispose();
             }
 
-            if (_timeoutTimer != null)
-                _timeoutTimer.Stop();
+            _timeoutTimer.Dispose();
 
             timer.Stop();
 
@@ -519,7 +498,11 @@ namespace Abot.Crawler
 
         private CrawlConfiguration GetCrawlConfigurationFromConfigFile()
         {
-            AbotConfigurationSectionHandler configFromFile = AbotConfigurationSectionHandler.LoadFromXml();
+            var builder = new ConfigurationBuilder();
+            builder.AddJsonFile("appsettings.json");
+            var cr = builder.Build();
+            
+            AbotConfigurationSectionHandler configFromFile = new AbotConfigurationSectionHandler(cr);
 
             if (configFromFile == null)
                 throw new InvalidOperationException("abot config section was NOT found");
@@ -556,7 +539,7 @@ namespace Abot.Crawler
                 return;
 
             if (!_memoryManager.IsSpaceAvailable(_crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb))
-                throw new InsufficientMemoryException(string.Format("Process does not have the configured [{0}mb] of available memory to crawl site [{1}]. This is configurable through the minAvailableMemoryRequiredInMb in app.conf or CrawlConfiguration.MinAvailableMemoryRequiredInMb.", _crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb, _crawlContext.RootUri));
+                throw new OutOfMemoryException(string.Format("Process does not have the configured [{0}mb] of available memory to crawl site [{1}]. This is configurable through the minAvailableMemoryRequiredInMb in app.conf or CrawlConfiguration.MinAvailableMemoryRequiredInMb.", _crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb, _crawlContext.RootUri));
         }
 
         protected virtual void RunPreWorkChecks()
@@ -584,7 +567,7 @@ namespace Abot.Crawler
                 _memoryManager = null;
 
                 string message = string.Format("Process is using [{0}mb] of memory which is above the max configured of [{1}mb] for site [{2}]. This is configurable through the maxMemoryUsageInMb in app.conf or CrawlConfiguration.MaxMemoryUsageInMb.", currentMemoryUsage, _crawlContext.CrawlConfiguration.MaxMemoryUsageInMb, _crawlContext.RootUri);
-                _crawlResult.ErrorException = new InsufficientMemoryException(message);
+                _crawlResult.ErrorException = new OutOfMemoryException(message);
 
                 _logger.Fatal(_crawlResult.ErrorException);
                 _crawlContext.IsCrawlHardStopRequested = true;
@@ -645,12 +628,9 @@ namespace Abot.Crawler
             }
         }
 
-        protected virtual void HandleCrawlTimeout(object sender, ElapsedEventArgs e)
+        protected virtual void HandleCrawlTimeout(object state)
         {
-            Timer elapsedTimer = sender as Timer;
-            if (elapsedTimer != null)
-                elapsedTimer.Stop();
-
+            _timeoutTimer.Dispose();
             _logger.Info("Crawl timeout of [{0}] seconds has been reached for [{1}]", _crawlContext.CrawlConfiguration.CrawlTimeoutSeconds, _crawlContext.RootUri);
             _crawlContext.IsCrawlHardStopRequested = true;
         }
@@ -996,7 +976,7 @@ namespace Abot.Crawler
             _logger.Info("Configuration Values:");
 
             string indentString = new string(' ', 2);
-            string abotVersion = Assembly.GetAssembly(this.GetType()).GetName().Version.ToString();
+            string abotVersion = typeof(RuntimeEnvironment).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString();
             _logger.Info("{0}Abot Version: {1}", indentString, abotVersion);
             foreach (PropertyInfo property in config.GetType().GetProperties())
             {
@@ -1095,7 +1075,7 @@ namespace Abot.Crawler
                 // Check if the location is absolute. If not, create an absolute uri.
                 if (!Uri.TryCreate(location, UriKind.Absolute, out locationUri))
                 {
-                    Uri baseUri = new Uri(crawledPage.Uri.GetLeftPart(UriPartial.Authority));
+                    Uri baseUri = new Uri(string.Concat(crawledPage.Uri.Scheme, "://", crawledPage.Uri.Host));
                     locationUri = new Uri(baseUri, location);
                 }
             }
