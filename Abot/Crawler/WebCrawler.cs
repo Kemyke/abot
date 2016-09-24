@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
@@ -1070,7 +1071,7 @@ namespace Abot.Crawler
                 locationUri = crawledPage.HttpWebResponse.ResponseUri;
             } else {
                 // For manual redirects, we need to look for the location header.
-                var location = crawledPage.HttpWebResponse.Headers["Location"];
+                var location = crawledPage.HttpWebResponse.Headers.GetValues("Location").FirstOrDefault();
 
                 // Check if the location is absolute. If not, create an absolute uri.
                 if (!Uri.TryCreate(location, UriKind.Absolute, out locationUri))

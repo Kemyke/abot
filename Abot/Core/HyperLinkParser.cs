@@ -86,7 +86,7 @@ namespace Abot.Core
 
             //Use the uri of the page that actually responded to the request instead of crawledPage.Uri (Issue 82).
             //Using HttpWebRequest.Address instead of HttpWebResonse.ResponseUri since this is the best practice and mentioned on http://msdn.microsoft.com/en-us/library/system.net.httpwebresponse.responseuri.aspx
-            Uri uriToUse = crawledPage.HttpWebRequest.Address ?? crawledPage.Uri;
+            Uri uriToUse = crawledPage.HttpWebRequest.RequestUri ?? crawledPage.Uri;
 
             //If html base tag exists use it instead of page uri for relative links
             string baseHref = GetBaseHrefValue(crawledPage);
@@ -135,7 +135,7 @@ namespace Abot.Core
             //X-Robots-Tag http header
             if(_config.IsRespectHttpXRobotsTagHeaderNoFollowEnabled)
             {
-                var xRobotsTagHeader = crawledPage.HttpWebResponse.Headers["X-Robots-Tag"];
+                var xRobotsTagHeader = crawledPage.HttpWebResponse.Headers.GetValues("X-Robots-Tag").FirstOrDefault();
                 if (xRobotsTagHeader != null && 
                     (xRobotsTagHeader.ToLower().Contains("nofollow") ||
                      xRobotsTagHeader.ToLower().Contains("none")))

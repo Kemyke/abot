@@ -4,6 +4,8 @@ using NLog;
 using System;
 using System.IO;
 using System.Net;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -11,14 +13,14 @@ namespace Abot.Core
 {
     public interface IWebContentExtractor : IDisposable
     {
-        PageContent GetContent(WebResponse response);
+        PageContent GetContent(HttpResponseMessage response);
     }
 
     public class WebContentExtractor : IWebContentExtractor
     {
         static ILogger _logger = LogManager.GetLogger("AbotLogger");
 
-        public virtual PageContent GetContent(WebResponse response)
+        public virtual PageContent GetContent(HttpResponseMessage response)
         {
             using (MemoryStream memoryStream = GetRawData(response))
             {
@@ -52,10 +54,10 @@ namespace Abot.Core
             }
         }
 
-        protected virtual string GetCharsetFromHeaders(WebResponse webResponse)
+        protected virtual string GetCharsetFromHeaders(HttpResponseMessage webResponse)
         {
             string charset = null;
-            String ctype = webResponse.Headers["content-type"];
+            String ctype = webResponse.Headers.GetValues("content-type").FirstOrDefault();
             if (ctype != null)
             {
                 int ind = ctype.IndexOf("charset=");
@@ -106,13 +108,13 @@ namespace Abot.Core
             return charset;
         }
 
-        private MemoryStream GetRawData(WebResponse webResponse)
+        private MemoryStream GetRawData(HttpResponseMessage webResponse)
         {
             MemoryStream rawData = new MemoryStream();
 
             try
             {
-                using (Stream rs = webResponse.GetResponseStream())
+                using (Stream rs = webResponse.Content.ReadAsStreamAsync().GetAwaiter().GetResult())
                 {
                     byte[] buffer = new byte[1024];
                     int read = rs.Read(buffer, 0, buffer.Length);
@@ -125,7 +127,7 @@ namespace Abot.Core
             }
             catch (Exception e)
             {
-                _logger.Warn("Error occurred while downloading content of url {0}", webResponse.ResponseUri.AbsoluteUri);
+                _logger.Warn("Error occurred while downloading content of url {0}", webResponse.RequestMessage.RequestUri.AbsoluteUri);
                 _logger.Warn(e);
             }
 

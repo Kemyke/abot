@@ -127,7 +127,7 @@ namespace Abot.Util
 		{
 			get
 			{
-				return (double)this.TrueBits() / this._hashBits.Count;
+				return (double)this.TrueBits() / this._hashBits.Length;
 			}
 		}
  
@@ -280,7 +280,7 @@ namespace Abot.Util
 		/// <returns> The <see cref="int"/>. </returns>
 		private int ComputeHash(int primaryHash, int secondaryHash, int i)
 		{
-			int resultingHash = (primaryHash + (i * secondaryHash)) % this._hashBits.Count;
+			int resultingHash = (primaryHash + (i * secondaryHash)) % this._hashBits.Length;
 			return Math.Abs((int)resultingHash);
 		}
 	}

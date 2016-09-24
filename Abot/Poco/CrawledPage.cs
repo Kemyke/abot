@@ -7,6 +7,7 @@ using System.Net;
 using AngleSharp;
 using AngleSharp.Parser.Html;
 using AngleSharp.Dom.Html;
+using System.Net.Http;
 
 namespace Abot.Poco
 {
@@ -44,7 +45,7 @@ namespace Abot.Poco
         /// <summary>
         /// Web request sent to the server
         /// </summary>
-        public HttpWebRequest HttpWebRequest { get; set; }
+        public HttpRequestMessage HttpWebRequest { get; set; }
 
         /// <summary>
         /// Web response from the server. NOTE: The Close() method has been called before setting this property.

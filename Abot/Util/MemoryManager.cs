@@ -45,24 +45,7 @@ namespace Abot.Util
 
             bool isAvailable = true;
 
-            MemoryFailPoint _memoryFailPoint = null;
-            try
-            {
-                _memoryFailPoint = new MemoryFailPoint(sizeInMb);
-            }
-            catch (InsufficientMemoryException)
-            {
-                isAvailable = false;
-            }
-            catch (NotImplementedException)
-            {
-                _logger.Warn("MemoryFailPoint is not implemented on this platform. The MemoryManager.IsSpaceAvailable() will just return true.");
-            }
-            finally
-            {
-                if (_memoryFailPoint != null)
-                    _memoryFailPoint.Dispose();
-            }
+            _logger.Warn("MemoryFailPoint is not implemented on this platform. The MemoryManager.IsSpaceAvailable() will just return true.");
 
             return isAvailable;
         }

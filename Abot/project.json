@@ -8,7 +8,8 @@
     "NRobotsCore": "1.1.0",
     "Microsoft.DotNet.InternalAbstractions": "1.0.1-beta-003206",
     "Microsoft.Extensions.Configuration": "1.0.0",
-    "Microsoft.Extensions.Configuration.Json": "1.0.0"
+    "Microsoft.Extensions.Configuration.Json": "1.0.0",
+    "system.net.http.winhttphandler": "4.0.0-beta-23123"
   },
   "frameworks": {
     //"net451": {

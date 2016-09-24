@@ -6,6 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Abot.Core
 {
@@ -48,13 +50,6 @@ namespace Abot.Core
 
             _config = config;
 
-            if (_config.HttpServicePointConnectionLimit > 0)
-                ServicePointManager.DefaultConnectionLimit = _config.HttpServicePointConnectionLimit;
-
-            if (!_config.IsSslCertificateValidationEnabled)
-                ServicePointManager.ServerCertificateValidationCallback +=
-                    (sender, certificate, chain, sslPolicyErrors) => true;
-
             _extractor = contentExtractor ?? new WebContentExtractor();
         }
 
@@ -76,60 +71,69 @@ namespace Abot.Core
 
             CrawledPage crawledPage = new CrawledPage(uri);
 
-            HttpWebRequest request = null;
-            HttpWebResponse response = null;
-            try
-            {
-                request = BuildRequestObject(uri);
-                crawledPage.RequestStarted = DateTime.Now;
-                response = (HttpWebResponse)request.GetResponseAsync().Result; //TODO use await
-                ProcessResponseObject(response);
-            }
-            catch (WebException e)
-            {
-                crawledPage.WebException = e;
+            HttpRequestMessage request = null;
+            HttpResponseMessage response = null;
 
-                if (e.Response != null)
-                    response = (HttpWebResponse)e.Response;
-
-                _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
-                _logger.Debug(e);
-            }
-            catch (Exception e)
-            {
-                _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
-                _logger.Debug(e);
-            }
-            finally
+            WinHttpHandler handler = new WinHttpHandler();
+            handler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            handler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+            using (var client = new HttpClient(handler))
             {
                 try
                 {
-                    crawledPage.HttpWebRequest = request;
-                    crawledPage.RequestCompleted = DateTime.Now;
-                    if (response != null)
-                    {
-                        crawledPage.HttpWebResponse = new HttpWebResponseWrapper(response);
-                        CrawlDecision shouldDownloadContentDecision = shouldDownloadContent(crawledPage);
-                        if (shouldDownloadContentDecision.Allow)
-                        {
-                            crawledPage.DownloadContentStarted = DateTime.Now;
-                            crawledPage.Content = _extractor.GetContent(response);
-                            crawledPage.DownloadContentCompleted = DateTime.Now;
-                        }
-                        else
-                        {
-                            _logger.Debug("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
-                        }
+                    request = BuildRequestObject(client, handler, uri);
+                    crawledPage.RequestStarted = DateTime.Now;
+                    response = client.SendAsync(request).GetAwaiter().GetResult();
+                    ProcessResponseObject(handler, response);
+                }
+                catch (WebException e)
+                {
+                    crawledPage.WebException = e;
 
-                        response.Dispose();//Should already be closed by _extractor but just being safe
-                    }
+                    //if (e.Response != null)
+                    //    response = e.Response;
+
+                    _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
+                    _logger.Debug(e);
                 }
                 catch (Exception e)
                 {
-                    _logger.Debug("Error occurred finalizing requesting url [{0}]", uri.AbsoluteUri);
+                    _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
                     _logger.Debug(e);
                 }
+                finally
+                {
+                    try
+                    {
+                        crawledPage.HttpWebRequest = request;
+                        crawledPage.RequestCompleted = DateTime.Now;
+                        if (response != null)
+                        {
+                            crawledPage.HttpWebResponse = new HttpWebResponseWrapper(response);
+                            CrawlDecision shouldDownloadContentDecision = shouldDownloadContent(crawledPage);
+                            if (shouldDownloadContentDecision.Allow)
+                            {
+                                crawledPage.DownloadContentStarted = DateTime.Now;
+                                crawledPage.Content = _extractor.GetContent(response);
+                                crawledPage.DownloadContentCompleted = DateTime.Now;
+                            }
+                            else
+                            {
+                                _logger.Debug("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
+                            }
+
+                            response.Dispose();//Should already be closed by _extractor but just being safe
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Debug("Error occurred finalizing requesting url [{0}]", uri.AbsoluteUri);
+                        _logger.Debug(e);
+                    }
+                }
             }
+
+
 
             return crawledPage;
         }
@@ -201,24 +205,24 @@ namespace Abot.Core
         //    });
         //}
 
-        protected virtual HttpWebRequest BuildRequestObject(Uri uri)
+        protected virtual HttpRequestMessage BuildRequestObject(HttpClient c, WinHttpHandler handler, Uri uri)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
-            request.Headers["User-Agent"] = _config.UserAgentString;
-            request.Accept = "*/*";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            handler.AutomaticRedirectionPolicy = _config.IsHttpRequestAutoRedirectsEnabled ? AutomaticRedirectionPolicy.Always : AutomaticRedirectionPolicy.Never;
+            request.Headers.UserAgent.Add(new ProductInfoHeaderValue(_config.UserAgentString));
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
 
             if (_config.HttpRequestMaxAutoRedirects > 0)
-                request.MaximumAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
+                handler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
 
             if (_config.IsHttpRequestAutomaticDecompressionEnabled)
-                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+                request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip, deflate"));
 
             if (_config.HttpRequestTimeoutInSeconds > 0)
-                request.Timeout = _config.HttpRequestTimeoutInSeconds * 1000;
+                c.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);
 
             if (_config.IsSendingCookiesEnabled)
-                request.CookieContainer = _cookieContainer;
+                handler.CookieContainer = _cookieContainer;
 
             //Supposedly this does not work... https://github.com/sjdirect/abot/issues/122
             //if (_config.IsAlwaysLogin)
@@ -229,18 +233,18 @@ namespace Abot.Core
             if (_config.IsAlwaysLogin)
             {
                 string credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(_config.LoginUser + ":" + _config.LoginPassword));
-                request.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);
             }
 
             return request;
         }
 
-        protected virtual void ProcessResponseObject(HttpWebResponse response)
+        protected virtual void ProcessResponseObject(WinHttpHandler handler, HttpResponseMessage response)
         {
             if (response != null && _config.IsSendingCookiesEnabled)
             {
-                CookieCollection cookies = response.Cookies;
-                _cookieContainer.Add(cookies);
+                CookieCollection cookies = handler.CookieContainer.GetCookies(response.RequestMessage.RequestUri);
+                _cookieContainer.Add(response.RequestMessage.RequestUri, cookies);
             }
         }
 

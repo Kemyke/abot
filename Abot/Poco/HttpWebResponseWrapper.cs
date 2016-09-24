@@ -4,6 +4,8 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace Abot.Poco
@@ -16,7 +18,7 @@ namespace Abot.Poco
     /// </remarks>
     public class HttpWebResponseWrapper
     {
-        private readonly HttpWebResponse _internalResponse;
+        private readonly HttpResponseMessage _internalResponse;
         private readonly byte[] _content;
         private readonly Lazy<Stream> _contentStream;
         protected static bool? IsMutuallyAuthenticatedImplemented { get; set; }
@@ -24,7 +26,7 @@ namespace Abot.Poco
         #region Constructors
 
         /// <summary>Constructs a response based on the received system http response.</summary>
-        public HttpWebResponseWrapper(HttpWebResponse response)
+        public HttpWebResponseWrapper(HttpResponseMessage response)
         {
             _internalResponse = response;
 
@@ -32,40 +34,48 @@ namespace Abot.Poco
                 return;
 
             StatusCode = response.StatusCode;
-            ContentType = response.ContentType;
-            ContentLength = response.ContentLength;
+            ContentType = response.Content.Headers.ContentType.ToString();
+            ContentLength = response.Content.Headers.ContentLength.Value;
             Headers = response.Headers;
-            CharacterSet = response.CharacterSet;
-            ContentEncoding = response.ContentEncoding;
-            Cookies = response.Cookies;
-            IsFromCache = response.IsFromCache;
+            //CharacterSet = response.CharacterSet;
+            ContentEncoding = response.Content.Headers.ContentEncoding.FirstOrDefault();
+            //Cookies = response.RequestMessage.Headers.Cookies;
+            //IsFromCache = response.IsFromCache;
             LastModified = GetLastModified(response);
-            Method = response.Method;
-            ProtocolVersion = response.ProtocolVersion;
-            ResponseUri = response.ResponseUri;
-            Server = response.Server;
-            StatusDescription = response.StatusDescription;
-
-            if (!IsMutuallyAuthenticatedImplemented.HasValue)
-            {
-                try
-                {
-                    IsMutuallyAuthenticated = response.IsMutuallyAuthenticated;
-                    IsMutuallyAuthenticatedImplemented = true;
-                }
-                catch (NotImplementedException e)
-                {
-                    IsMutuallyAuthenticatedImplemented = false;
-                }
-            }
-            IsMutuallyAuthenticated = IsMutuallyAuthenticatedImplemented.Value && response.IsMutuallyAuthenticated;
+            Method = response.RequestMessage.Method.ToString();
+            ProtocolVersion = response.Version;
+            ResponseUri = response.RequestMessage.RequestUri;
+            Server = response.Headers.Server.ToString();
+            StatusDescription = response.ReasonPhrase;
+            
+            //if (!IsMutuallyAuthenticatedImplemented.HasValue)
+            //{
+            //    try
+            //    {
+            //        IsMutuallyAuthenticated = response.IsMutuallyAuthenticated;
+            //        IsMutuallyAuthenticatedImplemented = true;
+            //    }
+            //    catch (NotImplementedException e)
+            //    {
+            //        IsMutuallyAuthenticatedImplemented = false;
+            //    }
+            //}
+            //IsMutuallyAuthenticated = IsMutuallyAuthenticatedImplemented.Value && response.IsMutuallyAuthenticated;
         }
 
-        private static DateTime GetLastModified(HttpWebResponse response)
+        private static DateTime GetLastModified(HttpResponseMessage response)
         {
             try
             {
-                return response.LastModified;
+                var lm = response.Content.Headers.LastModified;
+                if (lm.HasValue)
+                {
+                    return lm.Value.DateTime; //Last-Modified
+                }
+                else
+                {
+                    return DateTime.MinValue;
+                }
             }
             catch (ProtocolViolationException)
             {
@@ -75,7 +85,7 @@ namespace Abot.Poco
 
         /// <summary>Constructs a response based on custom parameters.</summary>
         /// <remarks>Recieves parameters neccesarily set for Abot to work.</remarks>
-        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, WebHeaderCollection headers)
+        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, HttpResponseHeaders headers)
         {
             StatusCode = statusCode;
             Headers = headers;
@@ -99,17 +109,17 @@ namespace Abot.Poco
         /// <summary>Server designated length of content in bytes</summary>
         public long ContentLength { get; set; }
         /// <summary>Collection of headers in the response</summary>
-        public WebHeaderCollection Headers { get; set; }
+        public HttpResponseHeaders Headers { get; set; }
         /// <summary>Gets the character set of the response.</summary>
-        public string CharacterSet { get; set; }
+        //public string CharacterSet { get; set; }
         /// <summary>Gets the method that is used to encode the body of the response.</summary>
         public string ContentEncoding { get; set; }
         /// <summary>Gets or sets the cookies that are associated with this response.</summary>
-        public CookieCollection Cookies { get; set; }
+        //public CookieCollection Cookies { get; set; }
         /// <summary>Was the response generated from the local cache?</summary>
-        public bool IsFromCache { get; set; }
+        //public bool IsFromCache { get; set; }
         /// <summary>Gets a System.Boolean value that indicates whether both client and server were authenticated.</summary>
-        public bool IsMutuallyAuthenticated { get; set; }
+        //public bool IsMutuallyAuthenticated { get; set; }
         /// <summary>Gets the last date and time that the contents of the response were modified.</summary>
         public DateTime LastModified { get; set; }
         /// <summary>Gets the method that is used to return the response.</summary>
@@ -131,14 +141,14 @@ namespace Abot.Poco
         public Stream GetResponseStream()
         {
             return _internalResponse != null ?
-                _internalResponse.GetResponseStream() :
+                _internalResponse.Content.ReadAsStreamAsync().GetAwaiter().GetResult() :
                 _contentStream.Value;
         }
 
         /// <summary>Gets the header with the given name.</summary>
         public string GetResponseHeader(string header)
         {
-            return Headers != null ? Headers[header] : null;
+            return Headers != null ? Headers.GetValues(header).FirstOrDefault() : null;
         }
 
         #endregion
