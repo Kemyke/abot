@@ -652,7 +652,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void ShouldDownloadPageContent_HttpStatusNon200_ReturnsFalse()
         {
-            Uri non200Uri = new Uri("http://localhost.fiddler:1111/HttpResponse/Status403");
+            Uri non200Uri = new Uri("http://localhost:1111/HttpResponse/Status403");
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(new PageRequester(_crawlContext.CrawlConfiguration).MakeRequest(non200Uri), new CrawlContext());
 

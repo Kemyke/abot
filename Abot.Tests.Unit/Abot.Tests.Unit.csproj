@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Abot.Tests.Unit</RootNamespace>
     <AssemblyName>Abot.Tests.Unit</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -44,9 +44,6 @@
     <Reference Include="Commoner.Core, Version=1.0.12.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Commoner.1.0.12.0\lib\net40\Commoner.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CsQuery">
-      <HintPath>..\packages\CsQuery.1.3.4\lib\net40\CsQuery.dll</HintPath>
     </Reference>
     <Reference Include="Elmah">
       <HintPath>..\packages\elmah.corelibrary.1.2.2\lib\Elmah.dll</HintPath>
@@ -89,10 +86,6 @@
     <Reference Include="nunit.framework, Version=3.4.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.4.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="Robots, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NRobotsPatched.1.0.5.0\lib\net40\Robots.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -197,9 +190,9 @@
       <Project>{48CBD934-4E30-4F48-ABD4-BC10EEA239A3}</Project>
       <Name>Abot.SiteSimulator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Abot\Abot.csproj">
-      <Project>{0CDCD537-4B0E-4514-966F-F425CDC92BA4}</Project>
-      <Name>Abot</Name>
+    <ProjectReference Include="..\Abot\AbotCore.xproj">
+      <Project>{95d62cc3-7d38-446f-b658-db2871be2a93}</Project>
+      <Name>AbotCore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

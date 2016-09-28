@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Threading;
 
 namespace Abot.Tests.Unit.Crawler
@@ -1166,12 +1167,13 @@ namespace Abot.Tests.Unit.Crawler
                 .Returns(new CrawlDecision { Allow = false });
             _fakeHyperLinkParser.Setup(f => f.GetLinks(It.IsAny<CrawledPage>())).Returns(new List<Uri>());
 
-            CrawledPage page = new CrawledPage(_rootUri) {
+            CrawledPage page = new CrawledPage(_rootUri)
+            {
                 WebException = new WebException(),
                 HttpWebResponse = new HttpWebResponseWrapper(HttpStatusCode.ServiceUnavailable,
                     "",
                     null,
-                    new WebHeaderCollection{ {"Retry-After", "1"} })
+                    new List<KeyValuePair<string, IEnumerable<string>>> { new KeyValuePair<string, IEnumerable<string>>("Retry-After", new List<string> { "1" }) })
             };
             _fakeHttpRequester.Setup(f => f.MakeRequest(It.IsAny<Uri>(), It.IsAny<Func<CrawledPage, CrawlDecision>>())).Returns(page);
 
@@ -1201,7 +1203,7 @@ namespace Abot.Tests.Unit.Crawler
                 HttpWebResponse = new HttpWebResponseWrapper(HttpStatusCode.ServiceUnavailable,
                     "",
                     null,
-                    new WebHeaderCollection{ {"Retry-After", DateTime.Now.AddSeconds(1).ToString() } })
+                    new List<KeyValuePair<string, IEnumerable<string>>> { new KeyValuePair<string, IEnumerable<string>>("Retry-After", new List<string> { DateTime.Now.AddSeconds(1).ToString() }) })
             };
             _fakeHttpRequester.Setup(f => f.MakeRequest(It.IsAny<Uri>(), It.IsAny<Func<CrawledPage, CrawlDecision>>())).Returns(page);
 
@@ -1223,11 +1225,13 @@ namespace Abot.Tests.Unit.Crawler
 
             // Setup a root page that was redirected.
             Uri redirectedUri = new Uri("http://www.domain.com/");
-            CrawledPage page = new CrawledPage(_rootUri) {
+            CrawledPage page = new CrawledPage(_rootUri)
+            {
                 WebException = new WebException(),
-                HttpWebResponse = new HttpWebResponseWrapper {
+                HttpWebResponse = new HttpWebResponseWrapper
+                {
                     StatusCode = HttpStatusCode.Redirect,
-                    Headers = new WebHeaderCollection { { "Location", redirectedUri.AbsoluteUri } }
+                    Headers = new List<KeyValuePair<string, IEnumerable<string>>> { new KeyValuePair<string, IEnumerable<string>>("Location", new List<string> { redirectedUri.AbsoluteUri }) }
                 }
             };
             _fakeHttpRequester.Setup(f => f.MakeRequest(It.IsAny<Uri>(), It.IsAny<Func<CrawledPage, CrawlDecision>>())).Returns(page);

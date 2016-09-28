@@ -36,7 +36,7 @@ namespace Abot.Poco
             StatusCode = response.StatusCode;
             ContentType = response.Content.Headers.ContentType.ToString();
             ContentLength = response.Content.Headers.ContentLength.Value;
-            Headers = response.Headers;
+            Headers = response.Headers.ToList();
             //CharacterSet = response.CharacterSet;
             ContentEncoding = response.Content.Headers.ContentEncoding.FirstOrDefault();
             //Cookies = response.RequestMessage.Headers.Cookies;
@@ -85,10 +85,10 @@ namespace Abot.Poco
 
         /// <summary>Constructs a response based on custom parameters.</summary>
         /// <remarks>Recieves parameters neccesarily set for Abot to work.</remarks>
-        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, HttpResponseHeaders headers)
+        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
         {
             StatusCode = statusCode;
-            Headers = headers;
+            Headers = headers.ToList();
             ContentType = contentType;
             ContentLength = content != null ? content.Length : 0;
             _content = content;
@@ -109,7 +109,7 @@ namespace Abot.Poco
         /// <summary>Server designated length of content in bytes</summary>
         public long ContentLength { get; set; }
         /// <summary>Collection of headers in the response</summary>
-        public HttpResponseHeaders Headers { get; set; }
+        public List<KeyValuePair<string, IEnumerable<string>>> Headers { get; set; }
         /// <summary>Gets the character set of the response.</summary>
         //public string CharacterSet { get; set; }
         /// <summary>Gets the method that is used to encode the body of the response.</summary>
@@ -148,9 +148,21 @@ namespace Abot.Poco
         /// <summary>Gets the header with the given name.</summary>
         public string GetResponseHeader(string header)
         {
-            return Headers != null ? Headers.GetValues(header).FirstOrDefault() : null;
+            return Headers.FirstOrDefault(x => x.Key == header).Value.FirstOrDefault(); 
         }
 
+        public void AddResponseHeader(string key, string value)
+        {
+            if (Headers != null)
+            {
+                Headers.RemoveAll(x => x.Key == key);
+            }
+            else
+            {
+                Headers = new List<KeyValuePair<string, IEnumerable<string>>>();
+            }
+            Headers.Add(new KeyValuePair<string, IEnumerable<string>>(key, new List<string> { value }));
+        }
         #endregion
     }
 }

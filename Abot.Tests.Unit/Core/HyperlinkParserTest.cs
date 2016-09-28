@@ -22,11 +22,11 @@ namespace Abot.Tests.Unit.Core
         [SetUp]
         public void Setup()
         {
-            _crawledPage = new PageRequester(new CrawlConfiguration()).MakeRequest(new Uri("http://localhost.fiddler:1111/"));
+            _crawledPage = new PageRequester(new CrawlConfiguration()).MakeRequest(new Uri("http://localhost:1111/"));
 
             //Make the real request above look like it came from the fake uri
             _crawledPage.ParentUri = _uri;
-            _crawledPage.HttpWebRequest = (HttpWebRequest)WebRequest.Create(_uri);
+            _crawledPage.HttpWebRequest = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, _uri);
             
             _unitUnderTest = GetInstance(false, false, null, false, false);
         }
@@ -317,9 +317,7 @@ namespace Abot.Tests.Unit.Core
         public void GetLinks_ResponseUriDiffFromRequestUri_UsesResponseUri()
         {
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
-
-            //This sets the Address properties backing field which does not have a public set method
-            ValueHelper.SetFieldValue(_crawledPage.HttpWebRequest, "_Uri", new Uri("http://zzz.com/"));
+            _crawledPage.HttpWebRequest.RequestUri = new Uri("http://zzz.com/");
 
             IEnumerable<Uri> result = _unitUnderTest.GetLinks(_crawledPage);
 
@@ -429,7 +427,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetLinks_HttpXRobotsTagHeaderNoIndexNoFollow_ReturnsEmptyList()
         {
-            _crawledPage.HttpWebResponse.Headers.Add(new NameValueCollection() {{ "X-Robots-Tag", "noindex, nofollow" } });
+            _crawledPage.HttpWebResponse.AddResponseHeader("X-Robots-Tag", "noindex, nofollow");
             _unitUnderTest = GetInstance(false, false, null, false, true);
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
 
@@ -442,7 +440,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetLinks_HttpXRobotsTagHeaderNoIndexNoFollowUpperCase_ReturnsEmptyList()
         {
-            _crawledPage.HttpWebResponse.Headers.Add(new NameValueCollection() { { "X-Robots-Tag", "NOINDEX, NOFOLLOW" } });
+            _crawledPage.HttpWebResponse.AddResponseHeader("X-Robots-Tag", "NOINDEX, NOFOLLOW");
             _unitUnderTest = GetInstance(false, false, null, false, true);
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
 
@@ -455,7 +453,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetLinks_HttpXRobotsTagHeaderNoIndexNoFollowUsingNone_ReturnsEmptyList()
         {
-            _crawledPage.HttpWebResponse.Headers.Add(new NameValueCollection() { { "X-Robots-Tag", "none" } });
+            _crawledPage.HttpWebResponse.AddResponseHeader("X-Robots-Tag", "none");
             _unitUnderTest = GetInstance(false, false, null, false, true);
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
 
@@ -468,7 +466,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetLinks_HttpXRobotsTagHeaderNoIndexNoFollowUsingNoneUpperCase_ReturnsEmptyList()
         {
-            _crawledPage.HttpWebResponse.Headers.Add(new NameValueCollection() { { "X-Robots-Tag", "NONE" } });
+            _crawledPage.HttpWebResponse.AddResponseHeader("X-Robots-Tag", "NONE");
             _unitUnderTest = GetInstance(false, false, null, false, true);
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
 
@@ -481,7 +479,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetLinks_HttpXRobotsNoFollow_ReturnsEmptyList()
         {
-            _crawledPage.HttpWebResponse.Headers.Add(new NameValueCollection() { { "X-Robots-Tag", "nofollow" } });
+            _crawledPage.HttpWebResponse.AddResponseHeader("X-Robots-Tag", "nofollow");
             _unitUnderTest = GetInstance(false, false, null, false, true);
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
 
@@ -494,7 +492,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetLinks_HttpXRobotsTagHeaderNoIndex_ReturnsLinks()
         {
-            _crawledPage.HttpWebResponse.Headers.Add(new NameValueCollection() { { "X-Robots-Tag", "noindex" } });
+            _crawledPage.HttpWebResponse.AddResponseHeader("X-Robots-Tag", "noindex");
             _unitUnderTest = GetInstance(false, false, null, false, true);
             _crawledPage.Content.Text = "<a href=\"/aaa/a.html\" ></a><a href=\"/bbb/b.html\" /></a>";
 

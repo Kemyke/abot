@@ -12,7 +12,7 @@ namespace Abot.Demo
             PrintDisclaimer();
 
             Uri uriToCrawl = GetSiteToCrawl(args);
-
+            
             IWebCrawler crawler;
 
             //Uncomment only one of the following to see that instance in action

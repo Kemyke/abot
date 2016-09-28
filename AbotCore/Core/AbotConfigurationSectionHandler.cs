@@ -142,17 +142,17 @@ namespace Abot.Core
         
         public int MaxPagesToCrawl
         {
-            get { return int.Parse(config["MaxConcurrentThreads"]); }
+            get { return int.Parse(config["MaxPagesToCrawl"]); }
         }
         
         public int MaxPagesToCrawlPerDomain
         {
-            get { return int.Parse(config["MaxConcurrentThreads"]); }
+            get { return int.Parse(config["MaxPagesToCrawlPerDomain"]); }
         }
 
         public int MaxPageSizeInBytes
         {
-            get { return int.Parse(config["MaxConcurrentThreads"]); }
+            get { return int.Parse(config["MaxPageSizeInBytes"]); }
         }
 
         public string UserAgentString

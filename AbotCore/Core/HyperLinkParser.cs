@@ -135,7 +135,7 @@ namespace Abot.Core
             //X-Robots-Tag http header
             if(_config.IsRespectHttpXRobotsTagHeaderNoFollowEnabled)
             {
-                var xRobotsTagHeader = crawledPage.HttpWebResponse.Headers.GetValues("X-Robots-Tag").FirstOrDefault();
+                var xRobotsTagHeader = crawledPage.HttpWebResponse.GetResponseHeader("X-Robots-Tag");
                 if (xRobotsTagHeader != null && 
                     (xRobotsTagHeader.ToLower().Contains("nofollow") ||
                      xRobotsTagHeader.ToLower().Contains("none")))

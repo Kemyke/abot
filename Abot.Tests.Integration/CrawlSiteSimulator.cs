@@ -1,6 +1,7 @@
 ﻿using Abot.Core;
 using Abot.Crawler;
 using Abot.Poco;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -167,7 +168,12 @@ namespace Abot.Tests.Integration
         {
             new PageRequester(new CrawlConfiguration { UserAgentString = "aaa" }).MakeRequest(new Uri("http://localhost.fiddler:1111/PageGenerator/ClearCounters"));
 
-            CrawlConfiguration configuration = AbotConfigurationSectionHandler.LoadFromXml().Convert();
+            var builder = new ConfigurationBuilder();
+            builder.AddJsonFile("appsettings.json");
+            var cr = builder.Build();
+
+            CrawlConfiguration configuration = new AbotConfigurationSectionHandler(cr).Convert();
+
             configuration.MaxRetryCount = 3;
             configuration.MinRetryDelayInMilliseconds = 2000;
 

@@ -68,13 +68,13 @@ namespace Abot.Core
 
         protected override string GetBaseHrefValue(CrawledPage crawledPage)
         {
-            string baseTagValue = crawledPage.CsQueryDocument.QuerySelector("base").Attributes["href"].Value ?? "";
+            string baseTagValue = crawledPage.CsQueryDocument.QuerySelector("base")?.Attributes["href"].Value ?? "";
             return baseTagValue.Trim();
         }
 
         protected override string GetMetaRobotsValue(CrawledPage crawledPage)
         {
-            return crawledPage.CsQueryDocument.QuerySelectorAll("meta[name]").FirstOrDefault(d => d.NodeName.ToLowerInvariant() == "robots")?.Attributes["content"].Value;
+            return crawledPage.CsQueryDocument.QuerySelectorAll("meta[name]").FirstOrDefault(d => d.Attributes["name"]?.Value.ToLower() == "robots")?.Attributes["content"].Value;
         }
 
         protected virtual bool HasRelCanonicalPointingToDifferentUrl(IElement e, string orginalUrl)

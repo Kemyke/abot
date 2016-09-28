@@ -15,7 +15,7 @@ namespace Abot.Tests.Unit
             var dir = Path.GetDirectoryName(typeof(AssemblySetup).Assembly.Location);
             Directory.SetCurrentDirectory(dir);
 
-            FiddlerProxyUtil.StartAutoRespond(@"..\..\..\TestResponses.saz");
+            FiddlerProxyUtil.StartAutoRespond(@"..\..\..\..\TestResponses.saz");
             Console.WriteLine("Started FiddlerCore to autorespond with pre recorded http responses.");
         }
 

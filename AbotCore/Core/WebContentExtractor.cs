@@ -57,7 +57,7 @@ namespace Abot.Core
         protected virtual string GetCharsetFromHeaders(HttpResponseMessage webResponse)
         {
             string charset = null;
-            String ctype = webResponse.Headers.GetValues("content-type").FirstOrDefault();
+            String ctype = webResponse.Content.Headers.GetValues("content-type").FirstOrDefault();
             if (ctype != null)
             {
                 int ind = ctype.IndexOf("charset=");

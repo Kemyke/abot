@@ -70,7 +70,7 @@ namespace Abot.Core
         protected override string GetBaseHrefValue(CrawledPage crawledPage)
         {
             string hrefValue = "";
-            HtmlNode node = crawledPage.HtmlDocument.DocumentNode.Descendants("base").Single();
+            HtmlNode node = crawledPage.HtmlDocument.DocumentNode.Descendants("base").SingleOrDefault();
 
             //Must use node.InnerHtml instead of node.InnerText since "aaa<br />bbb" will be returned as "aaabbb"
             if (node != null)

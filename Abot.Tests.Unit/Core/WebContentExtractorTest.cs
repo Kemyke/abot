@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 
 namespace Abot.Tests.Unit.Core
@@ -28,7 +29,7 @@ namespace Abot.Tests.Unit.Core
         public void GetContent_Utf8()
         {
             PageContent result = null;
-            using (WebResponse response = GetWebStream(_utf8))
+            using (HttpResponseMessage response = GetWebStream(_utf8))
             {
                 result = _uut.GetContent(response);
             }
@@ -45,7 +46,7 @@ namespace Abot.Tests.Unit.Core
         public void GetContent_NonUtf8()
         {
             PageContent result = null;
-            using (WebResponse response = GetWebStream(_japan))
+            using (HttpResponseMessage response = GetWebStream(_japan))
             {
                 result = _uut.GetContent(response);
             }
@@ -61,7 +62,7 @@ namespace Abot.Tests.Unit.Core
         public void GetContent_MetaSingleQuotes_NonUtf8()
         {
             PageContent result = null;
-            using (WebResponse response = GetWebStream(_japanMetaSingleQuotes))
+            using (HttpResponseMessage response = GetWebStream(_japanMetaSingleQuotes))
             {
                 result = _uut.GetContent(response);
             }
@@ -77,7 +78,7 @@ namespace Abot.Tests.Unit.Core
         public void GetContent_MetaDoubleQuotesAndClose_NonUtf8()
         {
             PageContent result = null;
-            using (WebResponse response = GetWebStream(_japanMetaDoubleQuotesAndClose))
+            using (HttpResponseMessage response = GetWebStream(_japanMetaDoubleQuotesAndClose))
             {
                 result = _uut.GetContent(response);
             }
@@ -93,7 +94,7 @@ namespace Abot.Tests.Unit.Core
         public void GetContent_MetaSingleQuotesAndClose_NonUtf8()
         {
             PageContent result = null;
-            using (WebResponse response = GetWebStream(_japanMetaSingleQuotesAndClose))
+            using (HttpResponseMessage response = GetWebStream(_japanMetaSingleQuotesAndClose))
             {
                 result = _uut.GetContent(response);
             }
@@ -108,7 +109,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public void GetContent_Cp1251_ConvertsToWindows1251()
         {
-            WebRequest.RegisterPrefix("test", new TestWebRequestCreate());
+            //WebRequest.RegisterPrefix("test", new TestWebRequestCreate());
             TestWebRequest request = TestWebRequestCreate.CreateTestRequest("<meta http-equiv=Content-Type content=\"text/html; charset=cp1251\">");
             var response = request.GetResponse();
              
@@ -121,21 +122,22 @@ namespace Abot.Tests.Unit.Core
             Assert.IsTrue(result.Text.StartsWith("<meta http-equiv="));
         }
 
-        private WebResponse GetWebStream(Uri uri)
+        private HttpResponseMessage GetWebStream(Uri uri)
         {
-            WebRequest request = WebRequest.Create(uri);
-
-            return request.GetResponse();
+            using (var client = new HttpClient())
+            {
+                return client.GetAsync(uri).GetAwaiter().GetResult();
+            }
         }
     }
 
 
-    class TestWebRequestCreate : IWebRequestCreate
+    class TestWebRequestCreate 
     {
-        static WebRequest nextRequest;
+        static HttpRequestMessage nextRequest;
         static object lockObject = new object();
 
-        static public WebRequest NextRequest
+        static public HttpRequestMessage NextRequest
         {
             get { return nextRequest; }
             set
@@ -148,7 +150,7 @@ namespace Abot.Tests.Unit.Core
         }
 
         /// <summary>See <see cref="IWebRequestCreate.Create"/>.</summary>
-        public WebRequest Create(Uri uri)
+        public HttpRequestMessage Create(Uri uri)
         {
             return nextRequest;
         }
@@ -164,15 +166,11 @@ namespace Abot.Tests.Unit.Core
         }
     }
 
-    class TestWebRequest : WebRequest
+    class TestWebRequest : HttpRequestMessage
     {
         MemoryStream requestStream = new MemoryStream();
         MemoryStream responseStream;
-
-        public override string Method { get; set; }
-        public override string ContentType { get; set; }
-        public override long ContentLength { get; set; }
-
+        
         /// <summary>Initializes a new instance of <see cref="TestWebRequest"/> 
         /// with the response to return.</summary>
         public TestWebRequest(string response)
@@ -185,25 +183,18 @@ namespace Abot.Tests.Unit.Core
         {
             return System.Text.Encoding.UTF8.GetString(requestStream.ToArray());
         }
-
-        /// <summary>See <see cref="WebRequest.GetRequestStream"/>.</summary>
-        public override Stream GetRequestStream()
-        {
-            return requestStream;
-        }
-
+        
         /// <summary>See <see cref="WebRequest.GetResponse"/>.</summary>
-        public override WebResponse GetResponse()
+        public HttpResponseMessage GetResponse()
         {
             return new TestWebReponse(responseStream);
         }
     }
 
-    class TestWebReponse : WebResponse
+    class TestWebReponse : HttpResponseMessage
     {
         Stream responseStream;
         WebHeaderCollection headers;
-        public override WebHeaderCollection Headers { get { return headers; } }
 
         /// <summary>Initializes a new instance of <see cref="TestWebReponse"/> 
         /// with the response stream to return.</summary>
@@ -211,12 +202,6 @@ namespace Abot.Tests.Unit.Core
         {
             this.responseStream = responseStream;
             headers = new WebHeaderCollection();
-        }
-
-        /// <summary>See <see cref="WebResponse.GetResponseStream"/>.</summary>
-        public override Stream GetResponseStream()
-        {
-            return responseStream;
         }
     }
 }

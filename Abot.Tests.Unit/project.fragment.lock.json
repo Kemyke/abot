@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "exports": {
+    "Abot.SiteSimulator/1.0.0": {
+      "type": "project",
+      "framework": ".NETFramework,Version=v4.6",
+      "compile": {
+        "bin/Abot.SiteSimulator.dll": {}
+      },
+      "runtime": {
+        "../packages/Microsoft.AspNet.Mvc.5.2.2/lib/net45/System.Web.Mvc.dll": {},
+        "../packages/Microsoft.AspNet.Razor.3.2.2/lib/net45/System.Web.Razor.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.2/lib/net45/System.Web.Helpers.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.2/lib/net45/System.Web.WebPages.Deployment.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.2/lib/net45/System.Web.WebPages.Razor.dll": {},
+        "../packages/Microsoft.AspNet.WebPages.3.2.2/lib/net45/System.Web.WebPages.dll": {},
+        "../packages/Microsoft.Web.Infrastructure.1.0.0.0/lib/net40/Microsoft.Web.Infrastructure.dll": {},
+        "bin/Abot.SiteSimulator.dll": {}
+      },
+      "contentFiles": {
+        "bin/Abot.SiteSimulator.pdb": {
+          "buildAction": "None",
+          "codeLanguage": "any",
+          "copyToOutput": true
+        }
+      }
+    }
+  }
+}

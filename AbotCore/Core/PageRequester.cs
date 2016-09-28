@@ -77,6 +77,7 @@ namespace Abot.Core
             WinHttpHandler handler = new WinHttpHandler();
             handler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             handler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+
             using (var client = new HttpClient(handler))
             {
                 try
@@ -208,15 +209,15 @@ namespace Abot.Core
         protected virtual HttpRequestMessage BuildRequestObject(HttpClient c, WinHttpHandler handler, Uri uri)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
-            handler.AutomaticRedirectionPolicy = _config.IsHttpRequestAutoRedirectsEnabled ? AutomaticRedirectionPolicy.Always : AutomaticRedirectionPolicy.Never;
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue(_config.UserAgentString));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+            handler.AutomaticRedirection = _config.IsHttpRequestAutoRedirectsEnabled;
+            request.Headers.UserAgent.ParseAdd(_config.UserAgentString);
+            request.Headers.Accept.ParseAdd("*/*");
 
             if (_config.HttpRequestMaxAutoRedirects > 0)
                 handler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
 
             if (_config.IsHttpRequestAutomaticDecompressionEnabled)
-                request.Headers.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip, deflate"));
+                request.Headers.AcceptEncoding.ParseAdd("gzip, deflate");
 
             if (_config.HttpRequestTimeoutInSeconds > 0)
                 c.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);

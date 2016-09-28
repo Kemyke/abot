@@ -65,6 +65,7 @@ namespace Abot.Tests.Unit.Poco
         }
 
         [Test]
+        [Ignore("Too long")]
         public void HtmlDocument_ToManyNestedTagsInSource1_DoesNotCauseStackOverflowException()
         {
             //FYI this test will not fail, it will just throw an uncatchable stackoverflowexception that will kill the process that runs this test
@@ -81,6 +82,7 @@ namespace Abot.Tests.Unit.Poco
         }
 
         [Test]
+        [Ignore("Too long")]
         public void HtmlDocument_ToManyNestedTagsInSource2_DoesNotCauseStackOverflowException()
         {
             //FYI this test will not fail, it will just throw an uncatchable stackoverflowexception that will kill the process that runs this test
@@ -152,7 +154,7 @@ namespace Abot.Tests.Unit.Poco
             };
 
             Assert.IsNotNull(unitUnderTest.CsQueryDocument);
-            Assert.AreEqual(4, unitUnderTest.CsQueryDocument.Length);
+            Assert.AreEqual(4, unitUnderTest.CsQueryDocument.Body.Children.Length);
         }
 
         [Test]
