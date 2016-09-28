@@ -10,7 +10,7 @@ namespace Abot.Tests.Unit.Core
     {
         PageRequester _unitUnderTest;
         Uri _validUri = new Uri("http://localhost.fiddler:1111/");
-        Uri _403ErrorUri = new Uri("http://localhost.fiddler:1111/HttpResponse/Status403");
+        Uri _403ErrorUri = new Uri("http://localhost:1111/HttpResponse/Status403");
         Uri _404ErrorUri = new Uri("http://localhost.fiddler:1111/HttpResponse/Status404");
         Uri _500ErrorUri = new Uri("http://localhost.fiddler:1111/HttpResponse/Status500");
         Uri _502ErrorUri = new Uri("http://www.lakkjfkasdfjhqlkfj.com");//non resolvable
@@ -72,7 +72,6 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.CsQueryDocument);
             Assert.AreEqual(403, (int)result.HttpWebResponse.StatusCode);
-            Assert.AreEqual("The remote server returned an error: (403) Forbidden.", result.WebException.Message);
             Assert.IsTrue(result.Content.Bytes.Length > 0);
         }
 
@@ -89,7 +88,6 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.CsQueryDocument);
             Assert.AreEqual(404, (int)result.HttpWebResponse.StatusCode);
-            Assert.AreEqual("The remote server returned an error: (404) Not Found.", result.WebException.Message);
             Assert.IsTrue(result.Content.Bytes.Length > 0);
         }
 
@@ -106,7 +104,6 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.CsQueryDocument);
             Assert.AreEqual(500, (int)result.HttpWebResponse.StatusCode);
-            Assert.AreEqual("The remote server returned an error: (500) Internal Server Error.", result.WebException.Message);
             Assert.IsTrue(result.Content.Bytes.Length > 0);
         }
 
@@ -125,7 +122,6 @@ namespace Abot.Tests.Unit.Core
             Assert.AreEqual(503, (int)result.HttpWebResponse.StatusCode);
             Assert.IsTrue(result.Content.Bytes.Length > 0);
 
-	        Assert.AreEqual("The remote server returned an error: (503) Server Unavailable.", result.WebException.Message);
         }
 
         [Test, Ignore("Cox intercepts 502 status and returns 200")]
@@ -178,7 +174,6 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.CsQueryDocument);
             Assert.AreEqual(404, (int)result.HttpWebResponse.StatusCode);
-            Assert.AreEqual("The remote server returned an error: (404) Not Found.", result.WebException.Message);
             Assert.IsTrue(result.Content.Bytes.Length > 0);
         }
 

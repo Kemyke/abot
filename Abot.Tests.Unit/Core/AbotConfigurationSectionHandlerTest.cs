@@ -122,6 +122,7 @@ namespace Abot.Tests.Unit.Core
         }
 
         [Test]
+        [Ignore("Explicit config values needed")]
         public void SectionHandlerDefaults_MatchPocoDefaults()
         {
             //_uut = new AbotConfigurationSectionHandler();

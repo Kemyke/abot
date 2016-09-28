@@ -73,29 +73,38 @@ namespace Abot.Core
 
             HttpRequestMessage request = null;
             HttpResponseMessage response = null;
+            HttpMessageHandler handler = null;
 
-            WinHttpHandler handler = new WinHttpHandler();
-            handler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            handler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+#if NET46
+            var wrhandler = new WebRequestHandler();
+            wrhandler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            //wrhandler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+            wrhandler.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
+            if (_config.HttpRequestMaxAutoRedirects > 0)
+                wrhandler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
+            if (_config.IsSendingCookiesEnabled)
+                wrhandler.CookieContainer = _cookieContainer;
+            handler = wrhandler;
+#else
+            var chhandler = new HttpClientHandler();
+            //chhandler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            chhandler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+            chhandler.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
+            if (_config.HttpRequestMaxAutoRedirects > 0)
+                chhandler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
+            if (_config.IsSendingCookiesEnabled)
+                chhandler.CookieContainer = _cookieContainer;
+            handler = chhandler;
+#endif
 
             using (var client = new HttpClient(handler))
             {
                 try
                 {
-                    request = BuildRequestObject(client, handler, uri);
+                    request = BuildRequestObject(client, uri);
                     crawledPage.RequestStarted = DateTime.Now;
                     response = client.SendAsync(request).GetAwaiter().GetResult();
-                    ProcessResponseObject(handler, response);
-                }
-                catch (WebException e)
-                {
-                    crawledPage.WebException = e;
-
-                    //if (e.Response != null)
-                    //    response = e.Response;
-
-                    _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
-                    _logger.Debug(e);
+                    ProcessResponseObject(response);
                 }
                 catch (Exception e)
                 {
@@ -123,8 +132,16 @@ namespace Abot.Core
                                 _logger.Debug("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
                             }
 
+                            response.EnsureSuccessStatusCode();
                             response.Dispose();//Should already be closed by _extractor but just being safe
                         }
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        crawledPage.WebException = e;
+
+                        _logger.Debug("Error occurred requesting url [{0}]", uri.AbsoluteUri);
+                        _logger.Debug(e);
                     }
                     catch (Exception e)
                     {
@@ -206,24 +223,17 @@ namespace Abot.Core
         //    });
         //}
 
-        protected virtual HttpRequestMessage BuildRequestObject(HttpClient c, WinHttpHandler handler, Uri uri)
+        protected virtual HttpRequestMessage BuildRequestObject(HttpClient c, Uri uri)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
-            handler.AutomaticRedirection = _config.IsHttpRequestAutoRedirectsEnabled;
             request.Headers.UserAgent.ParseAdd(_config.UserAgentString);
             request.Headers.Accept.ParseAdd("*/*");
-
-            if (_config.HttpRequestMaxAutoRedirects > 0)
-                handler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
 
             if (_config.IsHttpRequestAutomaticDecompressionEnabled)
                 request.Headers.AcceptEncoding.ParseAdd("gzip, deflate");
 
             if (_config.HttpRequestTimeoutInSeconds > 0)
                 c.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);
-
-            if (_config.IsSendingCookiesEnabled)
-                handler.CookieContainer = _cookieContainer;
 
             //Supposedly this does not work... https://github.com/sjdirect/abot/issues/122
             //if (_config.IsAlwaysLogin)
@@ -240,12 +250,12 @@ namespace Abot.Core
             return request;
         }
 
-        protected virtual void ProcessResponseObject(WinHttpHandler handler, HttpResponseMessage response)
+        protected virtual void ProcessResponseObject(HttpResponseMessage response)
         {
             if (response != null && _config.IsSendingCookiesEnabled)
             {
-                CookieCollection cookies = handler.CookieContainer.GetCookies(response.RequestMessage.RequestUri);
-                _cookieContainer.Add(response.RequestMessage.RequestUri, cookies);
+                //CookieCollection cookies = handler.CookieContainer.GetCookies(response.RequestMessage.RequestUri);
+                //_cookieContainer.Add(response.RequestMessage.RequestUri, cookies);
             }
         }
 

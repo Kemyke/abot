@@ -55,7 +55,7 @@ namespace Abot.Poco
         /// <summary>
         /// The web exception that occurred during the crawl
         /// </summary>
-        public WebException WebException { get; set; }
+        public HttpRequestException WebException { get; set; }
 
         public override string ToString()
         {

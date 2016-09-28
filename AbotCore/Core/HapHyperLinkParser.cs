@@ -82,7 +82,7 @@ namespace Abot.Core
         protected override string GetMetaRobotsValue(CrawledPage crawledPage)
         {
             string robotsMeta = null;
-            HtmlNode robotsNode = crawledPage.HtmlDocument.DocumentNode.Descendants("meta").Single(n => n.GetAttributeValue("name", "").ToLower() == "robots");
+            HtmlNode robotsNode = crawledPage.HtmlDocument.DocumentNode.Descendants("meta").SingleOrDefault(n => n.GetAttributeValue("name", "").ToLower() == "robots");
             if (robotsNode != null)
                 robotsMeta = robotsNode.GetAttributeValue("content", "");
 
@@ -102,7 +102,7 @@ namespace Abot.Core
                 if (HasRelNoFollow(node))
                     continue;
 
-                hrefValue = node.Attributes["href"].Value;
+                hrefValue = node.Attributes["href"]?.Value;
                 if (!string.IsNullOrWhiteSpace(hrefValue))
                 {
                     hrefValue = DeEntitize(hrefValue);

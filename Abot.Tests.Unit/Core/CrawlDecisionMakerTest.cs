@@ -759,7 +759,7 @@ namespace Abot.Tests.Unit.Core
             CrawlDecision result = _unitUnderTest.ShouldRecrawlPage(
                 new CrawledPage(new Uri("http://a.com/"))
                 {
-                    WebException = new WebException("something bad"),
+                    WebException = new System.Net.Http.HttpRequestException("something bad"),
                     RetryCount = 1
                 },
                 _crawlContext);
@@ -819,7 +819,7 @@ namespace Abot.Tests.Unit.Core
             CrawlDecision result = _unitUnderTest.ShouldRecrawlPage(
                 new CrawledPage(new Uri("http://a.com/"))
                 {
-                    WebException = new WebException("something bad")
+                    WebException = new System.Net.Http.HttpRequestException("something bad")
                 },
                 _crawlContext);
 
@@ -838,7 +838,7 @@ namespace Abot.Tests.Unit.Core
             CrawlDecision result = _unitUnderTest.ShouldRecrawlPage(
                 new CrawledPage(new Uri("http://a.com/"))
                 {
-                    WebException = new WebException("something bad"),
+                    WebException = new System.Net.Http.HttpRequestException("something bad"),
                     RetryCount = 5
                 },
                 _crawlContext);

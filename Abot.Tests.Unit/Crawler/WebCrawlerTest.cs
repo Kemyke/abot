@@ -1100,7 +1100,7 @@ namespace Abot.Tests.Unit.Crawler
 
             Assert.AreEqual(1, _dummyScheduler.Count);//no need to clear the scheduler since the crawl was never started
             Assert.IsTrue(result.ErrorOccurred);
-            Assert.IsTrue(result.ErrorException is InsufficientMemoryException);
+            Assert.IsTrue(result.ErrorException is OutOfMemoryException);
             Assert.AreEqual("Process does not have the configured [2147483647mb] of available memory to crawl site [http://a.com/]. This is configurable through the minAvailableMemoryRequiredInMb in app.conf or CrawlConfiguration.MinAvailableMemoryRequiredInMb.", result.ErrorException.Message);
             Assert.IsFalse(result.CrawlContext.IsCrawlStopRequested);
             Assert.IsFalse(result.CrawlContext.IsCrawlHardStopRequested);
@@ -1121,7 +1121,7 @@ namespace Abot.Tests.Unit.Crawler
             _fakeCrawlDecisionMaker.Verify(f => f.ShouldCrawlPage(It.IsAny<PageToCrawl>(), It.IsAny<CrawlContext>()), Times.Exactly(1));
             Assert.AreEqual(0, _dummyScheduler.Count);
             Assert.IsTrue(result.ErrorOccurred);
-            Assert.IsTrue(result.ErrorException is InsufficientMemoryException);
+            Assert.IsTrue(result.ErrorException is OutOfMemoryException);
             Assert.AreEqual("Process is using [2mb] of memory which is above the max configured of [1mb] for site [http://a.com/]. This is configurable through the maxMemoryUsageInMb in app.conf or CrawlConfiguration.MaxMemoryUsageInMb.", result.ErrorException.Message);
             Assert.IsFalse(result.CrawlContext.IsCrawlStopRequested);
             Assert.IsTrue(result.CrawlContext.IsCrawlHardStopRequested);
@@ -1169,7 +1169,7 @@ namespace Abot.Tests.Unit.Crawler
 
             CrawledPage page = new CrawledPage(_rootUri)
             {
-                WebException = new WebException(),
+                WebException = new System.Net.Http.HttpRequestException(),
                 HttpWebResponse = new HttpWebResponseWrapper(HttpStatusCode.ServiceUnavailable,
                     "",
                     null,
@@ -1199,7 +1199,7 @@ namespace Abot.Tests.Unit.Crawler
             _fakeHyperLinkParser.Setup(f => f.GetLinks(It.IsAny<CrawledPage>())).Returns(new List<Uri>());
 
             CrawledPage page = new CrawledPage(_rootUri) {
-                WebException = new WebException(),
+                WebException = new System.Net.Http.HttpRequestException(),
                 HttpWebResponse = new HttpWebResponseWrapper(HttpStatusCode.ServiceUnavailable,
                     "",
                     null,
@@ -1227,7 +1227,7 @@ namespace Abot.Tests.Unit.Crawler
             Uri redirectedUri = new Uri("http://www.domain.com/");
             CrawledPage page = new CrawledPage(_rootUri)
             {
-                WebException = new WebException(),
+                WebException = new System.Net.Http.HttpRequestException(),
                 HttpWebResponse = new HttpWebResponseWrapper
                 {
                     StatusCode = HttpStatusCode.Redirect,
@@ -1250,7 +1250,7 @@ namespace Abot.Tests.Unit.Crawler
             // Setup a root page that was redirected.
             Uri redirectedUri = new Uri("http://www.domain.com/");
             CrawledPage page = new CrawledPage(_rootUri) {
-                WebException = new WebException(),
+                WebException = new System.Net.Http.HttpRequestException(),
                 HttpWebResponse = new HttpWebResponseWrapper {
                     StatusCode = HttpStatusCode.OK,
                     ResponseUri = redirectedUri

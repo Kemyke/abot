@@ -22,36 +22,18 @@ namespace Abot.Core
 
         public virtual PageContent GetContent(HttpResponseMessage response)
         {
-            using (MemoryStream memoryStream = GetRawData(response))
-            {
-                String charset = GetCharsetFromHeaders(response);
+            String charset = GetCharsetFromHeaders(response);
 
-                if (charset == null) {
-                    memoryStream.Seek(0, SeekOrigin.Begin);
+            charset = CleanCharset(charset);
+            Encoding e = GetEncoding(charset);
 
-                    // Do not wrap in closing statement to prevent closing of this stream.
-                    StreamReader srr = new StreamReader(memoryStream, Encoding.ASCII);
-                    String body = srr.ReadToEnd();
-                    charset = GetCharsetFromBody(body);
-                }
-                memoryStream.Seek(0, SeekOrigin.Begin);
+            PageContent pageContent = new PageContent();
+            pageContent.Bytes = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+            pageContent.Encoding = e;
+            pageContent.Text = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            pageContent.Charset = charset ?? GetCharsetFromBody(pageContent.Text);
 
-                charset = CleanCharset(charset);
-                Encoding e = GetEncoding(charset);
-                string content = "";
-                using (StreamReader sr = new StreamReader(memoryStream, e))
-                {
-                    content = sr.ReadToEnd();
-                }
-
-                PageContent pageContent = new PageContent();
-                pageContent.Bytes = memoryStream.ToArray();
-                pageContent.Charset = charset;
-                pageContent.Encoding = e;
-                pageContent.Text = content;
-
-                return pageContent;
-            }
+            return pageContent;
         }
 
         protected virtual string GetCharsetFromHeaders(HttpResponseMessage webResponse)

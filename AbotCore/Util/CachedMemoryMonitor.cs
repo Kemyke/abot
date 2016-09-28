@@ -23,7 +23,7 @@ namespace Abot.Util
 
             UpdateCurrentUsageValue();
 
-            _usageRefreshTimer = new Timer(UsageRefreshTimerElapsed, null, 0, cacheExpirationInSeconds * 1000);
+            _usageRefreshTimer = new Timer(UsageRefreshTimerElapsed, null, cacheExpirationInSeconds * 1000, cacheExpirationInSeconds * 1000);
         }
 
         private void UsageRefreshTimerElapsed(object state)

@@ -148,7 +148,7 @@ namespace Abot.Poco
         /// <summary>Gets the header with the given name.</summary>
         public string GetResponseHeader(string header)
         {
-            return Headers.FirstOrDefault(x => x.Key == header).Value.FirstOrDefault(); 
+            return Headers.FirstOrDefault(x => x.Key == header).Value?.FirstOrDefault(); 
         }
 
         public void AddResponseHeader(string key, string value)
