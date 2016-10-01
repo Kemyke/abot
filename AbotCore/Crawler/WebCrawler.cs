@@ -9,7 +9,6 @@ using Abot.Core;
 using Abot.Poco;
 using Abot.Util;
 using AutoMapper;
-using Microsoft.DotNet.InternalAbstractions;
 using Microsoft.Extensions.Configuration;
 using NLog;
 
@@ -980,7 +979,7 @@ namespace Abot.Crawler
             _logger.Info("Configuration Values:");
 
             string indentString = new string(' ', 2);
-            string abotVersion = typeof(RuntimeEnvironment).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString();
+            string abotVersion = "0.1.6-alpha1";
             _logger.Info("{0}Abot Version: {1}", indentString, abotVersion);
             foreach (PropertyInfo property in config.GetType().GetProperties())
             {

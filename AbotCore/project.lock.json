@@ -201,25 +201,6 @@
           "lib/netstandard1.3/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DotNet.InternalAbstractions/1.0.1-beta-003206": {
-        "type": "package",
-        "dependencies": {
-          "System.AppContext": "4.1.0",
-          "System.Collections": "4.0.11",
-          "System.IO": "4.1.0",
-          "System.IO.FileSystem": "4.0.1",
-          "System.Reflection.TypeExtensions": "4.1.0",
-          "System.Runtime.Extensions": "4.1.0",
-          "System.Runtime.InteropServices": "4.1.0",
-          "System.Runtime.InteropServices.RuntimeInformation": "4.0.0"
-        },
-        "compile": {
-          "lib/netstandard1.3/Microsoft.DotNet.InternalAbstractions.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.3/Microsoft.DotNet.InternalAbstractions.dll": {}
-        }
-      },
       "Microsoft.Extensions.Configuration/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -2681,15 +2662,6 @@
       "Microsoft.Bcl.Build/1.0.14": {
         "type": "package"
       },
-      "Microsoft.DotNet.InternalAbstractions/1.0.1-beta-003206": {
-        "type": "package",
-        "compile": {
-          "lib/net451/Microsoft.DotNet.InternalAbstractions.dll": {}
-        },
-        "runtime": {
-          "lib/net451/Microsoft.DotNet.InternalAbstractions.dll": {}
-        }
-      },
       "Microsoft.Extensions.Configuration/1.0.0": {
         "type": "package",
         "dependencies": {
@@ -3447,17 +3419,6 @@
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
-      ]
-    },
-    "Microsoft.DotNet.InternalAbstractions/1.0.1-beta-003206": {
-      "sha512": "FznBxQy6fucPtW8c8R8Y4vYYc1f9t5pROz7fFV02cDwpx93TEXBiM7rn29TtZTe51TPJsHfX37CzBx8mGNFWhg==",
-      "type": "package",
-      "path": "Microsoft.DotNet.InternalAbstractions/1.0.1-beta-003206",
-      "files": [
-        "Microsoft.DotNet.InternalAbstractions.1.0.1-beta-003206.nupkg.sha512",
-        "Microsoft.DotNet.InternalAbstractions.nuspec",
-        "lib/net451/Microsoft.DotNet.InternalAbstractions.dll",
-        "lib/netstandard1.3/Microsoft.DotNet.InternalAbstractions.dll"
       ]
     },
     "Microsoft.Extensions.Configuration/1.0.0": {
@@ -8560,26 +8521,17 @@
       "AngleSharp >= 0.9.8.1",
       "AutoMapper >= 5.1.1",
       "HtmlAgilityPack >= 1.4.9.5",
-      "Microsoft.DotNet.InternalAbstractions >= 1.0.1-beta-003206",
       "Microsoft.Extensions.Configuration >= 1.0.0",
       "Microsoft.Extensions.Configuration.Json >= 1.0.0",
       "NLog >= 4.4.0-betaV15",
       "NRobotsCore >= 1.1.1-alpha1",
       "system.net.http.winhttphandler >= 4.0.0"
     ],
-    ".NETCoreApp,Version=v1.0": [
-      "Microsoft.CSharp >= 4.0.1",
-      "Microsoft.NETCore.App >= 1.0.1",
-      "NETStandard.Library >= 1.6.0",
-      "System.Dynamic.Runtime >= 4.0.11",
-      "System.Net.Http >= 4.1.0",
-      "System.Net.Primitives >= 4.0.11"
-    ],
+    ".NETCoreApp,Version=v1.0": [],
     ".NETFramework,Version=v4.6": [
       "Microsoft.Net.Http >= 2.2.22",
       "System.Configuration >= 4.0.0",
-      "System.Net.Http >= 4.0.0",
-      "System.Net.Primitives >= 4.0.10"
+      "System.Net.Http >= 4.0.0"
     ]
   },
   "tools": {},

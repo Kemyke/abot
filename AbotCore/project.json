@@ -1,6 +1,6 @@
 {
   "name": "AbotCore",
-  "version": "0.1.3-alpha1",
+  "version": "0.1.5-alpha1",
   "authors": [ "Steven Jones", "Kemy" ],
   "copyright": "Copyright 2012 SHARPDEV LLC",
   "description": ".NET Core port of sjdirect/abot. Abot is an open source C# web crawler built for speed and flexibility. It takes care of the low level plumbing (multithreading, http requests, scheduling, link parsing, etc..). You just register for events to process the page data. You can also plugin your own implementations of core interfaces to take complete control over the crawl process.",
@@ -11,7 +11,6 @@
     "NLog": "4.4.0-betaV15",
     "HtmlAgilityPack": "1.4.9.5",
     "NRobotsCore": "1.1.1-alpha1",
-    "Microsoft.DotNet.InternalAbstractions": "1.0.1-beta-003206",
     "Microsoft.Extensions.Configuration": "1.0.0",
     "Microsoft.Extensions.Configuration.Json": "1.0.0",
     "system.net.http.winhttphandler": "4.0.0"
@@ -20,8 +19,7 @@
     "net46": {
       "frameworkAssemblies": {
         "System.Configuration": "4.0.0.0",
-        "System.Net.Http": "4.0.0.0",
-        "System.Net.Primitives": "4.0.10.0"
+        "System.Net.Http": "4.0.0.0"
       },
       "dependencies": {
         "Microsoft.Net.Http": "2.2.22"
@@ -30,12 +28,6 @@
     "netcoreapp1.0": {
       "imports": [ "dnxcore50", "portable-net45+win8" ],
       "dependencies": {
-        "Microsoft.NETCore.App": "1.0.1",
-        "NETStandard.Library": "1.6.0",
-        "Microsoft.CSharp": "4.0.1",
-        "System.Dynamic.Runtime": "4.0.11",
-        "System.Net.Http": "4.1.0",
-        "System.Net.Primitives": "4.0.11"
       }
     }
   },
