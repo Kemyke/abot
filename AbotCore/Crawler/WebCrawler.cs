@@ -854,7 +854,7 @@ namespace Abot.Crawler
             _logger.Info("Configuration Values:");
 
             string indentString = new string(' ', 2);
-            string abotVersion = "0.1.6-alpha1";
+            string abotVersion = "0.1.7-alpha1";
             _logger.Info("{0}Abot Version: {1}", indentString, abotVersion);
             foreach (PropertyInfo property in config.GetType().GetProperties())
             {
