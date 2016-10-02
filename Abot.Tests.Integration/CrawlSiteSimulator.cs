@@ -37,7 +37,7 @@ namespace Abot.Tests.Integration
             int pagesCrawledCount = 0;
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(configuration, null, null, null, null, null, null, null, null);
-            crawler.PageCrawlCompletedAsync += (a, b) => pagesCrawledCount++;
+            crawler.PageCrawlCompleted += (a, b) => pagesCrawledCount++;
 
             crawler.Crawl(new Uri("http://localhost:1111/"));
 
@@ -55,7 +55,7 @@ namespace Abot.Tests.Integration
             int pagesCrawledCount = 0;
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(configuration, null, null, null, null, null, null, null, null);
-            crawler.PageCrawlCompletedAsync += (a, b) => pagesCrawledCount++;
+            crawler.PageCrawlCompleted += (a, b) => pagesCrawledCount++;
 
             crawler.Crawl(new Uri("http://localhost:1111/"));
 
@@ -74,7 +74,7 @@ namespace Abot.Tests.Integration
             int pagesCrawledCount = 0;
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(configuration, null, null, null, null, null, null, null, null);
-            crawler.PageCrawlCompletedAsync += (a, b) => pagesCrawledCount++;
+            crawler.PageCrawlCompleted += (a, b) => pagesCrawledCount++;
 
             crawler.Crawl(new Uri("http://localhost:1111/"));
 
@@ -90,7 +90,7 @@ namespace Abot.Tests.Integration
             int pagesCrawledCount = 0;
 
             PoliteWebCrawler crawler = new PoliteWebCrawler(configuration, null, null, null, null, null, null, null, null);
-            crawler.PageCrawlCompletedAsync += (a, b) => pagesCrawledCount++;
+            crawler.PageCrawlCompleted += (a, b) => pagesCrawledCount++;
 
             CrawlResult result = crawler.Crawl(new Uri("http://localhost:1111/"));
 
@@ -152,7 +152,7 @@ namespace Abot.Tests.Integration
             int pagesCrawledCount = 0;
 
             var crawler = new PoliteWebCrawler(configuration);
-            crawler.PageCrawlCompletedAsync += (a, b) => pagesCrawledCount++;
+            crawler.PageCrawlCompleted += (a, b) => pagesCrawledCount++;
 
             var uriToCrawl = new Uri("http://localhost:1111/");
             var start = DateTime.Now;

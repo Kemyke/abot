@@ -20,12 +20,11 @@ namespace Abot.Demo
             //crawler = GetManuallyConfiguredWebCrawler();
             //crawler = GetCustomBehaviorUsingLambdaWebCrawler();
 
-            //Subscribe to any of these asynchronous events, there are also sychronous versions of each.
             //This is where you process data about specific events of the crawl
-            crawler.PageCrawlStartingAsync += crawler_ProcessPageCrawlStarting;
-            crawler.PageCrawlCompletedAsync += crawler_ProcessPageCrawlCompleted;
-            crawler.PageCrawlDisallowedAsync += crawler_PageCrawlDisallowed;
-            crawler.PageLinksCrawlDisallowedAsync += crawler_PageLinksCrawlDisallowed;
+            crawler.PageCrawlStarting += crawler_ProcessPageCrawlStarting;
+            crawler.PageCrawlCompleted += crawler_ProcessPageCrawlCompleted;
+            crawler.PageCrawlDisallowed += crawler_PageCrawlDisallowed;
+            crawler.PageLinksCrawlDisallowed += crawler_PageLinksCrawlDisallowed;
 
             //Start the crawl
             //This is a synchronous call

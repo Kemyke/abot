@@ -15,10 +15,6 @@ namespace Abot.Crawler
     public interface IPoliteWebCrawler : IWebCrawler
     {
         /// <summary>
-        /// Event occur after robots txt is parsed asynchroniously
-        /// </summary>
-        event EventHandler<RobotsDotTextParseCompletedArgs> RobotsDotTextParseCompletedAsync;
-        /// <summary>
         /// Event occur after robots txt is parsed synchroniously
         /// </summary>
         event EventHandler<RobotsDotTextParseCompletedArgs> RobotsDotTextParseCompleted;
@@ -71,7 +67,6 @@ namespace Abot.Crawler
 
                 if (_robotsDotText != null)
                 {
-                    FireRobotsDotTextParseCompletedAsync(_robotsDotText.Robots);
                     FireRobotsDotTextParseCompleted(_robotsDotText.Robots);
 
                     robotsDotTextCrawlDelayInSecs = _robotsDotText.GetCrawlDelay(_crawlContext.CrawlConfiguration.RobotsDotTextUserAgentString);
@@ -137,7 +132,6 @@ namespace Abot.Crawler
                 string message = string.Format("Page [{0}] not crawled, [Disallowed by robots.txt file], set IsRespectRobotsDotText=false in config file if you would like to ignore robots.txt files.", pageToCrawl.Uri.AbsoluteUri);
                 _logger.Debug(message);
 
-                FirePageCrawlDisallowedEventAsync(pageToCrawl, message);
                 FirePageCrawlDisallowedEvent(pageToCrawl, message);
 
                 return false;
@@ -147,30 +141,9 @@ namespace Abot.Crawler
         }
 
         /// <summary>
-        /// Event occur after robots txt is parsed asynchroniously
-        /// </summary>
-        public event EventHandler<RobotsDotTextParseCompletedArgs> RobotsDotTextParseCompletedAsync;
-
-        /// <summary>
         /// Event occur after robots txt is parsed synchroniously
         /// </summary>
         public event EventHandler<RobotsDotTextParseCompletedArgs> RobotsDotTextParseCompleted;
-
-        /// <summary>
-        /// Fire robots txt parsed completed async
-        /// </summary>
-        /// <param name="robots"></param>
-        protected virtual void FireRobotsDotTextParseCompletedAsync(IRobots robots)
-        {
-            var threadSafeEvent = RobotsDotTextParseCompletedAsync;
-            if (threadSafeEvent == null) return;
-            //Fire each subscribers delegate async
-            foreach (var @delegate in threadSafeEvent.GetInvocationList())
-            {
-                var del = (EventHandler<RobotsDotTextParseCompletedArgs>) @delegate;
-                del.BeginInvoke(this, new RobotsDotTextParseCompletedArgs(_crawlContext, robots), null, null);
-            }
-        }
 
         /// <summary>
         /// Fire robots txt parsed completed
