@@ -77,7 +77,10 @@ namespace Abot.Core
 
 #if NET46
             var wrhandler = new WebRequestHandler();
-            wrhandler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            if (!_config.IsSslCertificateValidationEnabled)
+            {
+                wrhandler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
             //wrhandler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
             wrhandler.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
             if (_config.HttpRequestMaxAutoRedirects > 0)
@@ -87,8 +90,18 @@ namespace Abot.Core
             handler = wrhandler;
 #else
             var chhandler = new HttpClientHandler();
-            //chhandler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            chhandler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+            if (!_config.IsSslCertificateValidationEnabled)
+            {
+                chhandler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
+            try
+            {
+                chhandler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+            }
+            catch(PlatformNotSupportedException ex)
+            {
+                _logger.Error(ex);
+            }
             chhandler.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
             if (_config.HttpRequestMaxAutoRedirects > 0)
                 chhandler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
